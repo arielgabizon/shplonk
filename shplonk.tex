@@ -383,6 +383,8 @@
     \maketitle
 
 \begin{abstract}
+We present an enhanced version of the Kate, Zaverucha, Goldberg polynomial commitment scheme \cite{kate} where a single group element can be an openning proof for multiple polynomials at multiple points. 
+We apply this to the \plonk proof system to obtain ``for free'' constraints involving multiple shifts of a witness.
 \end{abstract}
 
 \section{Introduction}
@@ -644,19 +646,22 @@ We describe the following scheme based on \cite{kate}.
 
  
  
- We summarize the efficiency properties of this batched version of the \cite{kate} scheme.
+ We summarize the efficiency properties of the scheme.
  
  \begin{lemma}\label{lem:kate}
  Fix positive integer $d$.
   There is a $d$-polynomial commitment scheme \PCscheme such that
   \begin{enumerate}
    \item For $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f)$ requires $n$ \G1-exponentiations.
-   \item Given $\z \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_t \in \polysofdeg{d}$, denote by $t^*$ the number of distinct values in \z; and for $i\in [t^*]$, $d_i\defeq \max\sett{\deg(f_i)}{i\in S_i}$ where $S_i$ is the set of indices $j$ such that $z_j$ equals the $i$'th distinct point in \z.
+   \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$, denote by $k^*$ the number of distinct subsets  \set{S^*_1,\ldots,S^*_{k^*}} in \set{S_i}; and 
+   let $K\defeq t+1 + \sumi{k^*} t-|S^*_i|+1$.
+   and denote $d^* \defeq \max\sett{\deg(f_i)}{i\in [k]}$.
    Let $\cm_i = \com(f_i)$.
-   Then \open(\set{cm_i,f_i,z_i,s_i})  requires
+   Then \open(\set{cm_i},\set{f_i},T,\set{S_i},\set{s_{i,z}})  requires
    \begin{enumerate}
-    \item $\sum_{i\in [t^*]} d_i$ \G1-exponentiations of \prvpoly.
-    \item $t+t^*$ \G1-exponentiations and 2 pairings of \verpoly.
+   \item A single \G1 element to be passed from \prvpoly to \verpoly.
+    \item At most $d^*+1$ \G1-exponentiations of \prvpoly.
+    \item $k$ \G1-exponentiations, $K$ \G2-exponentiations  and $k^*+1$ pairings of \verpoly.
     \end{enumerate}
 \end{enumerate}
 
