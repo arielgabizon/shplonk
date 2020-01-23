@@ -385,13 +385,16 @@
     \maketitle
 
 \begin{abstract}
-We present an enhanced version of the Kate, Zaverucha and Goldberg polynomial commitment scheme \cite{kate} where a single group element can be an opening proof for multiple polynomials each evaluated at a different arbitrary subset of points. 
+We present an enhanced version of the Kate, Zaverucha and Goldberg polynomial commitment scheme \cite{kate} where a single group element can be an opening proof for multiple polynomials each evaluated at a different arbitrary subset of points.
+
+
+
 As a sample application we ``plug in'' this scheme into the \plonk proving system\cite{plonk} to obtain improved proof size and prover run time at the expense of additional verifier \G2 operations and pairings,  and additional \G2 SRS elements.
 \end{abstract}
 
 \section{Introduction}
 
-Polynomial commitment schemes (PCS) are an important primitive in arguably all practical succinct proving systems (see \cite{marlin,plonk,supersonic} for formalizations of their role). \footnote{While QAP based proving systems like \cite{pinocchio,groth16} are not traditionally formulated as using a PCS, they can be interpreted as using a PCS that also forces the committed polynomial to be in a certain subspace. This is related to the linear interactive proof framework of  \cite{bciop}.} They can ``force'' a prover to answer verifier queries according to a fixed polynomial of bounded degree.
+Polynomial commitment schemes (PCS) are an important primitive in arguably all\footnote{While QAP based proving systems like \cite{pinocchio,groth16} are not traditionally formulated as using a PCS, they can be interpreted as using a PCS that also forces the committed polynomial to be in a certain subspace. This is related to the linear interactive proof framework of  \cite{bciop}.} practical succinct proving systems (see \cite{marlin,plonk,supersonic} for formalizations of their role).  They can ``force'' a prover to answer verifier queries according to a fixed polynomial of bounded degree.
 
 The more straightforward version of this primitive contains an initial prover message $\com(f)$ corresponding to the commitment to a polynomial $f$. Then, whenever the prover sends a value $s\in \F$ which is allegedly the value $f(z)$ for $z$ known to the verifier, the prover will send a corresponding opening proof $\pi$ that this is indeed the case. In a protocol where this primitive is used for several polynomials and several evaluation points, prover run time and proof length will increase with each of these opening proofs.
 
@@ -700,7 +703,7 @@ We are ready to describe our PCS.
  \end{lemma}
 
 \section{Reducing verifier operations at the expense of proof length}
-We describe a variant of the scheme of Section \ref{sec:main} where we eliminate the verifier's \G2 operations and reduce the number of pairings to two. This comes at the cost of extra prover communication and computation, however the scheme is still gives significant savings in proof length compared to previous results, when the numer of distinct evaluation subsets $k^*$  is small.
+We describe a variant of the scheme of Section \ref{sec:main} where we eliminate the verifier's \G2 operations and reduce the number of pairings to two. This comes at the cost of an extra \G1 element sent by the prover. We state the result first, followed by the description of the scheme.
 
 \begin{lemma}\label{lem:multikateG1}
  Fix positive integer $d$.
@@ -708,14 +711,14 @@ We describe a variant of the scheme of Section \ref{sec:main} where we eliminate
   \begin{enumerate}
    \item For $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f)$ requires $n$ \G1-exponentiations.
    \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$, denote by $k^*$ the number of distinct subsets  \set{S^*_1,\ldots,S^*_{k^*}} in \set{S_i}; and 
-   let $K\defeq t-1 + \sumi {k^*}\left( t-|S^*_i|-1\right)$.
+   let $K\defeq t+ 1 + \sumi {k}\left( |S_i|\right)$.
    and denote $d^* \defeq \max\sett{\deg(f_i)}{i\in [k]}$.
    Let $\cm_i = \com(f_i)$.
    Then \open(\set{cm_i},\set{f_i},T,\set{S_i\subset T},\set{s_{i,z}})  requires
    \begin{enumerate}
-   \item Two  \G1 elements and $k^*$ \F elements to be passed from \prvpoly to \verpoly.
-    \item At most $d^*+1$ \G1-exponentiations of \prvpoly.
-    \item $k-k^*$ \G1-exponentiations, $K$ \G2-exponentiations  and $k^*+1$ pairings of \verpoly.
+   \item Two  \G1 elements to be passed from \prvpc to \verpc.
+    \item At most $2d^*+1$ \G1-exponentiations of \prvpc.
+    \item $K$ \G1-exponentiations,  and two pairings of \verpc.
     \end{enumerate}
 \end{enumerate}
 
@@ -733,28 +736,33 @@ We describe a variant of the scheme of Section \ref{sec:main} where we eliminate
   \item For $i\in [k]$, \verpc and \prvpc both compute the polynomials \sett{r_i}{i\in [k]}
   such that $r_i\in \polysofdeg{|S_i|}$ satisfies $r_i(z) = s_{i,z}$ for each $z\in S_i$. 
  \item \prvpc computes the polynomial
- \[g(X)\defeq \sum_{i=1}^t \gamma^{i-1}\cdot Z_{T\setminus S_i}(X)\cdot (f_i(X)-r_i(X)).\]
- and using \srs0 computes and sends $W\defeq \enc1{h(x)}$.
+ \[f(X)\defeq \sum_{i=1}^t \gamma^{i-1}\cdot Z_{T\setminus S_i}(X)\cdot (f_i(X)-r_i(X)).\]
+ Recall that $f$ is divisible by $Z_T$ according to Claim \ref{clm:div_sum}, and define
+ $h(X)\defeq f(X)/Z_T(X)$.
+ Using \srs0, \prvpc computes and sends $W\defeq \enc1{h(x)}$.
 % \[]
  \item \verpc sends random $z\in \F$.
- \item Let $S'_1,\ldots S'_{k^*}$ be the distinct subsets among $S_1,\ldots,S_k$. ``Split'' $g$ according to these distinct subsets; i.e. for $i\in [k^*]$
- \[g_i(X) \defeq \sum_{j\in [k], S_j=S'_i}^t \gamma^{j-1}\cdot Z_{T\setminus S_j}(X)\cdot (f_j(X)-r_j(X)).  \]
- Note that $g(X)=\sum_{i\in [k^*]} g_i(X)$.
- 
- \prvpc sends the values $t_i \defeq g_i(z)$ for $i\in [k^*]$.
+%  \item Let $S'_1,\ldots S'_{k^*}$ be the distinct subsets among $S_1,\ldots,S_k$. ``Split'' $g$ according to these distinct subsets; i.e. for $i\in [k^*]$
+%  \[g_i(X) \defeq \sum_{j\in [k], S_j=S'_i}^t \gamma^{j-1}\cdot Z_{T\setminus S_j}(X)\cdot (f_j(X)-r_j(X)).  \]
+%  Note that $g(X)=\sum_{i\in [k^*]} g_i(X)$.
+%  
+%  \prvpc sends the values $t_i \defeq g_i(z)$ for $i\in [k^*]$.
 
- \item \prvpc computes the polynomial
- \[h(X)\defeq g(X)/Z_T(X) =    \sum_{i\in [k^*]}\frac{g_i(X)}{Z_{S_i(X)}} . \]
- and using \srs0 computes and sends $W\defeq \enc1{h(x)}$.
+\item \prvpc computes the polynomial
+\[L(X)\defeq f_z(X) - Z_T(z)\cdot h(X),\]
+where 
+\[f_z(X)\defeq \sum_{i=1}^t \gamma^{i-1}\cdot Z_{T\setminus S_i}(z)\cdot (f_i(X)-r_i(X))\]
+Note that $L(z)= f(z)- Z_T(z)\cdot h(z) =0$, and thus $(X-z)$ divides $L$.
+\prvpc sends $W'\defeq \enc1{\frac{L(x)}{x-z}}$.
 
- \item\label{step:computeW} \verpc computes for each $i\in [k]$, $Z_i \defeq \enc2{Z_{T\setminus S_i}(x)}$. 
- \item \verpc computes
- \[F\defeq \sum_{i\in [k]} \gamma^{i-1} \cdot e(\cm_i-\enc1{r_i(x)}, Z_i).\]
+\item \verpc computes:
+\[F\defeq \sum_{i\in [t]} \gamma^{i-1} \cdot Z_{T\setminus S_i}(z)\cdot (\com(f_i) - \enc1{r_i(X)}) - Z_T(z)\cdot W \]
  \item \verpc outputs \acc if and only if
- \[ F = e(W,\enc2{Z_T(x)}).\]
- \end{enumerate}
+ \[ e(F,\enc2{1}) = e(W',\enc2{x-z}).\]
 
- We argue knowledge soundness for the above protocol. More precisely, we argue the existence of an efficient \ext such that an algebraic adversary \adv can only win the KS game w.p. \negl.
+\end{enumerate}
+
+ We argue knowledge soundness for the above protocol.More precisely, we argue the existence of an efficient \ext such that an algebraic adversary \adv can only win the KS game w.p. \negl.  The proof begins identically to the previous one. 
  %when restricting itself to choosing $z=z_1=\ldots=z_t$.
  
  
@@ -771,12 +779,23 @@ We describe a variant of the scheme of Section \ref{sec:main} where we eliminate
  In the first step of \open, \verpoly chooses a random $\gamma \in \F$.
  Let
  \[f(X)\defeq \sum_{i\in [t]} \gamma^{i-1} \cdot Z_{T\setminus S_i}\cdot (f_i(X)-r_i(X)).\]
- We know from Claim \ref{clm:div} that $F_{i^*} \defeq  Z_{T\setminus S_{i^*}}\cdot (f_{i^*}(X)-r_{i^*}(X))$ isn't divisible by $Z_T$. Thus, using Claim \ref{clm:div_sum}, we know that e.w.p $k/|\F|$ over $\gamma$, $f$ isn't divisble by $Z_T$.
-  Now \adv outputs $W=\enc1{H(x)}$ for some $H\in\polysofdeg{d}$.
- According to Lemma \ref{lem:AGManalysis}, it suffices to upper bound the probability that the ideal check corresponding to the real pairing check in the protocol passes. It has the form
- \[f(X) \equiv H(X)Z_T(X).\]
- The check passing implies that
- $f(X)$ is divisible by $Z_T$. Thus the ideal check can only pass w.p. $k/|\F|= \negl$ over the randomness of \verpoly, which implies the same thing for the real check according to Lemma \ref{lem:AGManalysis}.
+ We know from Claim \ref{clm:div} that $F_{i^*} \defeq  Z_{T\setminus S_{i^*}}\cdot (f_{i^*}(X)-r_{i^*}(X))$ isn't divisible by $Z_T$. Thus, using Claim \ref{clm:div_sum}, we know that e.w.p $k/|\F|$ over $\gamma$, $f$ isn't divisble by $Z_T$. Assume we are in this case.  Now \adv outputs $W=\enc1{H(x)}$ for some $H\in\polysofdeg{d}$, followed
+ by \verpc sending uniform $z\in \F$.
+ Since we are in the case that $f$ isn't divisble by $Z_T$, we know there are at most
+ $2d$ values $z\in \F$ such that $f(z) = H(z)\cdot Z_T(z)$; and thus $z$ chosen by \verpc is of this form only w.p. \negl. Assume $z$ sent by \verpc is not of this form.
+  \prvpc now outputs $W'=\enc1{H'(x)}$ for some $H'\in \polysofdeg{d}$
+ According to Lemma \ref{lem:AGManalysis}, it suffices to upper bound the probability that the ideal check corresponding to the real pairing check in the protocol passes. 
+ Denoting
+ \[L'(X)\defeq \sum_{i\in [t]} Z_{T\setminus S_i}(z)\cdot (f_i(X) - r_i(X)) - Z_T(z)\cdot H(X),\]
+ the ideal check has the form
+ \[L'(X)\equiv H'(X)\cdot (X-z),\]
+ and thus can pass for some $H'\in \polysofdeg{d}$ only if $L'$ is divisible by $(X-z)$, which means $L'(z)=0$.
+ However
+ \[L'(z) = \sum_{i\in [t]} Z_{T\setminus S_i}(z)\cdot (f_i(z) - r_i(z)) - Z_T(z)\cdot H(z)=
+  f(z)-Z_T(z)\cdot H(z),
+ \]
+and we are in the case where $f(z)\neq Z_T(z)\cdot H(z)$.
+ In summary, the ideal check can only pass w.p. $\negl$ over the randomness of \verpc, which implies the same thing for the real check according to Lemma \ref{lem:AGManalysis}.
  
  
  \end{enumerate}
