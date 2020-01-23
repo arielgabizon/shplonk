@@ -11,6 +11,8 @@
     version={3.0},
 ]{doclicense}
 
+\usepackage{fullpage}
+
 \usepackage[utf8]{inputenc} % set input encoding (not needed with xelatex)
 \usepackage[strict]{changepage}
     
@@ -82,11 +84,11 @@
 \newcommand{\bsigma}{\boldsymbol{\sigma}}
 %%% the "real" document content comes below...
 %\newcommand{\papertitle}{$\mathsf{Maitreya}$: Improved Prover Efficiency in Fully Succinct Universal zk-SNARKs through Permutation Arguments for Multiplicative Subgroups}
-\newcommand{\papertitle}{PLONK, SHPLONK}
+\newcommand{\papertitle}{An efficient polynomial commitment scheme for multiple points and polynomials}
 %\newcommand{\authorname}}
 \newcommand{\company}{}
 \title{ \bf \papertitle \\[0.72cm]}
-\author{Justin Drake \\ \tt{Ethereum Foundation} \and  Ariel Gabizon\\ \tt{Protocol Labs}  \and Zachary J. Williamson\\ \tt{Aztec Protocol}} 
+\author{Justin Drake \\ \tt{Ethereum Foundation} \and  Ariel Gabizon\\ \tt{AZTEC Protocol}  \and Zachary J. Williamson\\ \tt{AZTEC Protocol}} 
 
 % 	\large{\authorname} \\[0.5cm] \large{\company}
 % 	\\ {DRAFT}
@@ -375,7 +377,7 @@
 \usepackage{pifont}% http://ctan.org/pkg/pifont
 \newcommand{\cmark}{\ding{51}}%
 \newcommand{\xmark}{\ding{55}}%
-\newcommand{\plonk}{\ensuremath{\mathbf{Plonk}}\xspace}
+\newcommand{\plonk}{\ensuremath{\mathtt{PLONK}}\xspace}
 \newcommand{\marlin}{\ensuremath{\mathsf{Marlin}}\xspace}
 \newcommand{\fractal}{\ensuremath{\mathsf{Fractal}}\xspace}
 \newcommand{\Rsnark}{\R{\snark}}
@@ -383,50 +385,71 @@
     \maketitle
 
 \begin{abstract}
-We present an enhanced version of the Kate, Zaverucha, Goldberg polynomial commitment scheme \cite{kate} where a single group element can be an openning proof for multiple polynomials at multiple points. 
-We apply this to the \plonk proof system to obtain ``for free'' constraints involving multiple shifts of a witness.
+We present an enhanced version of the Kate, Zaverucha and Goldberg polynomial commitment scheme \cite{kate} where a single group element can be an opening proof for multiple polynomials each evaluated at a different arbitrary subset of points. 
+As a sample application we ``plug in'' this scheme into the \plonk proving system\cite{plonk} to obtain improved proof size and prover run time at the expense of additional verifier \G2 operations and pairings,  and additional \G2 SRS elements.
 \end{abstract}
 
 \section{Introduction}
-% 
-% Zero-knowledge Succinct Non-interactive Arguments of Knowledge (zk-SNARKs) \cite{Kilian,Micali,BCCT} represent a category of zero-knowledge proofs that can be used to prove knowledge of a witness for arbitrary NP relations, without leaking any information about the witness. Additionally, proofs are a only polylogarithmic in the witness size.
-% 
-% A setting that has gained much popularity is that of ``SNARKs with preprocessing'' (cf. e.g., \cite{GGPR}) where a one-time expensive computation of the verifier is allowed, in which a \emph{Structured Reference String} (SRS) is constructed. The advantage of this setting is potentially enabling polylogarithmic proof size and verification time also for non-uniform lang ugages.
-% 
-% More concretely, of great recent interest is the \emph{circuit satisfiability problem}, where given a public assignment for the values of a few of circuit wires, one wishes to demonstrate knowledge of an assignment to the rest of the wires that is consistent with the circuit computation.
-% 
-% Of great practical interest is having the preprocessing phase depend 
-% 
-% 
-% More concretely, when 
-% In what we call here a \emph{fully succinct} zk-SNARK
-% \footnote{Intuitively, one might consider polylogarithmic verification time a necessity for any SNARK, making the term ``fully succinct'' superflous. However, e.g., \cite{GGPR} only require polylogarithmic proof size in a SNARK; and in case verification time is also polylogarithmic call the SNARK \emph{unsubtle}.}
-% both the size of these proofs and the computation time are required to be polylogarithmic in witness size. 
+
+Polynomial commitment schemes (PCS) are an important primitive in arguably all practical succinct proving systems (see \cite{marlin,plonk,supersonic} for formalizations of their role). \footnote{While QAP based proving systems like \cite{pinocchio,groth16} are not traditionally formulated as using a PCS, they can be interpreted as using a PCS that also forces the committed polynomial to be in a certain subspace. This is related to the linear interactive proof framework of  \cite{bciop}.} They can ``force'' a prover to answer verifier queries according to a fixed polynomial of bounded degree.
+
+The more straightforward version of this primitive contains an initial prover message $\com(f)$ corresponding to the commitment to a polynomial $f$. Then, whenever the prover sends a value $s\in \F$ which is allegedly the value $f(z)$ for $z$ known to the verifier, the prover will send a corresponding opening proof $\pi$ that this is indeed the case. In a protocol where this primitive is used for several polynomials and several evaluation points, prover run time and proof length will increase with each of these opening proofs.
 
 
 
+\subsection{Previous work and our results}
+
+We take the PCS of Kate, Zaverucha and Goldberg \cite{kate} as our starting point. Their scheme is pairing based and an opening proof $\pi$ consists of a single $\G1$ group element. We ask whether we can get a variant of this scheme where a single opening proof (in the sense of one \G1 element) can prove correctness of multiple polynomial evaluations.
+
+Several works \cite{sonic,auroralight,marlin,plonk} (starting from \cite{sonic}) have noticed that it possible to modify the PCS of \cite{kate} in the random oracle model to allow for one opening proof for several polynomials \emph{at the same point $z\in \F$} .
+\cite{kate} give in their paper a less known version of their scheme allowing for one opening proof for one polynomial at several evaluation points.
 
 
-\subsection{Our results}
-% 
-% \begin{table}[!htbp]
-% 	\caption{Prover comparison. $m$ = number of wires, $n$ = number of multiplication gates, $a$ = number of addition gates}
-% 	\centering
-% \begin{adjustbox}{width=1\textwidth}
-% 	\begin{tabular}{l|l|l|l|l|l|l}
-% 	& \thead{size $\leq d$\\ SRS} & \thead{size $=n$\\ CRS/SRS} & \thead{prover\\ work} & \thead{proof\\ length} & \thead{succinct} & \thead{universal} \\ \hline
-% 		\groth
-% 		        & - & $3n + m$ \G1      & \makecell[l]{$3n + m - \ell$ \G1 exp, \\ $n$ \G2 exp} & $2$ \G1, $1$ \G2 & \cmark & \xmark \\ \hline
-% 		\sonic (helped)    & $12d$ \G1, $12d$ \G2 & $12n$ \G1         &   $18n$ \G1 exp      & $4$ \G1, $2$ $\F$ & \xmark & \cmark \\ \hline
-% 		\sonic (succinct)  & $4d$ \G1, $4d$ \G2             & $36n$ \G1          & $273n$ \G1 exp           & $20$ \G1, $16$ \F & \cmark & \cmark \\ \hline
-% 		\auroralight       & $2d$ \G1, $2d$ \G2   & $2n$ \G1          & $8n$ \G1 exp         & $6$ \G1, $4$ \F & \xmark & \cmark \\ \hline
-% 		This work (small)         & $3d$ \G1, $1$ \G2     & $3n + 3a$ \G1, $1$ \G2 & \makecell[l]{$11n + 11a$ \G1 exp , \\ $\approx54(n+a)\text{log}(n+a)$ \F mul}        & $7$ \G1, $7$ \F & \cmark & \cmark \\ \hline
-% 		This work (fast prover)         & $d$ \G1, $1$ \G2     & $n + a$ \G1, $1$ \G2 & \makecell[l]{$9n + 9a$ \G1 exp , \\ $\approx54(n+a)\text{log}(n+a)$ \F mul}        & $9$ \G1, $7$ \F & \cmark & \cmark \\ \hline
-% 	\end{tabular}
-% \end{adjustbox}
-% \label{table:prover-work}
-% \end{table} \
-% 
+
+In this paper, we give a scheme where a single group element can be the opening proof for multiple evaluation points and polynomials.
+We compare the performance of our PCS compared to a more straightforward batched version of the \cite{kate} scheme as in \cite{plonk}.
+For simplicity, we look at the restricted case where we want to open $t$ polynomials all with the same degree bound $n$, each at one \emph{distinct} point. See Lemma \ref{lem:multikate} for the more detailed efficiency properties in the general case (where each polynomial is opened at a subset of points, and the subsets may repeat).
+\begin{table}[!htbp]
+	\caption{Comparison of opening complexity for $t$ polynomials on $t$ distinct points. In prover/verifier work columns \Gi means scalar multiplication in \Gi, \F means addition or multiplication in \F, and \textbf{P} means pairing. }
+	\centering
+\begin{adjustbox}{width=1\textwidth}
+	\begin{tabular}{l|l|l|l|l}
+	& \thead{SRS size} & \thead{prover work} & \thead{proof\\ length} & \thead{verifier work} \\ \hline
+		\kate as in \cite{plonk}
+		         & $n$ \G1, $2$ \G2  & $t\cdot n$ \G1, $O(t\cdot n\log n)$ \F &   $t$ \G1 &  $3t-2$ \G1, $2$ \textbf{P}\\ \hline
+		This work     & $n$ \G1, $t+1$ \G2 &   $n$ \G1, $O(t\cdot n + n\log n)$ \F  & $1$ \G1 & $t-1$ \G1, $2t$ \G2, $t+1$ \textbf{P}   \\ \hline
+	\end{tabular}
+\end{adjustbox}
+\label{table:prover-work}
+\end{table} 
+
+
+
+\paragraph{Application to \plonk:}
+
+
+The \plonk proving system \cite{plonk}  allows generating proofs of knowledge for assignments
+to fan-in two arithmetic circuits with a universal and updatable SRS (see the paragraph on this topic in Section \ref{sec:terminology}). Most of the prover computation involves committing to several polynomials and opening them at two distinct evaluation points. Plugging in our PCS to \plonk allows saving in proof length and prover work related to the opening proof of the second evaluation point (we do not give full details, but all that is needed is repreating the transformation of Lemma 4.7 in \cite{plonk} using the PCS of Lemma \ref{lem:multikate} here instead of the PCS used there to obtain the new result).
+
+We compare the \plonk scheme when using the  \cite{kate}-based PCS in \cite{gwc} and the PCS of this paper in Table \ref{table:plonk}. As in \cite{plonk} we present look at two versions of \plonk where one optimizes fast proving, and the other small proof length.
+
+\begin{table}[!htbp]
+	\caption{Comparison of \plonk efficiency for fan-in two circuit with $n$  gates.}
+	\centering
+\begin{adjustbox}{width=1\textwidth}
+	\begin{tabular}{l|l|l|l|l}
+	 & \thead{SRS size} & \thead{prover \\ group exponentations} & \thead{proof\\ length} & verifier work \\ \hline
+		\cite{plonk} (fast) &  $n$ \G1, $2$ \G2  & $9n$ \G1 exp   & $9$ \G1, $7$ \F  &   $18$ \G1, $2$ \textbf{P} \\ \hline
+		\cite{plonk} (small) &  $3n$ \G1, $2$ \G2  & $11n$ \G1 exp   & $7$ \G1, $7$ \F  &   $16$ \G1, $2$ \textbf{P} \\ \hline
+		This work (fast)    &$n$ \G1, $3$ \G2 &  $8n$ \G1 exp    & $8$ \G1 $7$ \F &   $18$ \G1, $4$ \G2, $3$ \textbf{P} \\ \hline
+		This work (small)    &$3n$ \G1, $3$ \G2 &  $10n$ \G1 exp    & $6$ \G1 $7$ \F &   $16$ \G1, $4$ \G2, $3$ \textbf{P} \\ \hline
+
+		\end{tabular}
+\end{adjustbox}
+\label{table:plonk}
+\end{table} 
+
+
 \section{Preliminaries}
 
 
@@ -494,7 +517,7 @@ The corresponding ideal check, checks as a polynomial identity whether
 \[(R_1 \cdot T_1)\cdot (T_2\cdot R_2) \equiv 0\]
 
 
-The following lemma is inspired by \cite{AGM}'s analysis of \cite{Groth16},
+The following lemma is inspired by \cite{AGM}'s analysis of \cite{groth16},
 and tells us that for soundness analysis against algebraic adversaries it suffices to look at ideal checks.
 Before stating the lemma we define the $Q$-DLOG assumption similarly to \cite{AGM}.
 \begin{dfn}\label{ref:qdlog}
@@ -505,23 +528,12 @@ Before stating the lemma we define the $Q$-DLOG assumption similarly to \cite{AG
 \end{dfn}
 
 
+The following lemma is proved in \cite{plonk} based on the arguments of \cite{AGM}.
 \begin{lemma}\label{lem:AGManalysis}
 Assume the $Q$-DLOG for $(\G1,\G2)$.
  Given an algebraic adversary \adv participating in a protocol with a degree $Q$ SRS,
  the probability of any real pairing check passing is larger by at most an additive \negl factor than the probability the corresponding ideal check holds.
 \end{lemma}
-\begin{proof}
- Let $\gamma$ be the difference between the satisfiability of the real and ideal check.
- We describe an adversary \advv for the $Q$-DLOG problem that succeeds with probability $\gamma$; this implies $\gamma=\negl$.
- \advv receives the challenge 
- \[\enc1{1},\enc1{x},\ldots,\enc1{x^Q},\enc2{1},\enc2{x},\ldots,\enc2{x^Q}\]
-and constructs using group operations the correct SRS for the protocol.
- Now \advv runs the protocol with \adv, simulating the verifier role. Note that as \advv receives from \adv the vectors of coefficients $v$, he can compute the polynomials \set{R_{i,j}} and check if we are in the case that the real check passed but ideal check failed.
- In case we are in this event, \advv computes
- \[R\defeq (R_1 \cdot T_1)(T_2\cdot R_2). \]
- We have that $R\in\polysofdeg{2Q}$ is a non-zero polynomial for which
- $R(x)=0$. Thus \advv can factor $R$ and find $x$.
-\end{proof}
 
 
 \paragraph{Knowlege soundness in the Algebraic Group Model}
@@ -539,47 +551,55 @@ the probability of any algebraic adversary \adv winning the following game is \n
 
 \end{enumerate}
 
-
-
-
-\section{A batched version of the \cite{kate} scheme}\label{sec:kate}
-Crucial to the efficiency of our protocol is a batched version of the \cite{kate} polynomial commitment scheme similar to Appendix C of \cite{sonic}, allowing to query multiple committed polynomials at multiple points.
-%We are able to use the simplier original \cite{kate} scheme, as we do not care about exact degree bound.
-We begin by defining polynomial commitment schemes in a manner conducive to our protocol.
+\subsection{Polynomial commitment schemes}
+We define polynomial commitment schemes similarly to \cite{plonk}.
 Specifically, we define the \open procedure in a batched setting having multiple polynomials and evaluation points.
 
 \begin{dfn}\label{dfn:PCscheme}
-A $d$-polynomial commitment scheme consists of 
+A $d$-polynomial commitment scheme is a triplet $\PCscheme = (\gen,\com,\open)$ such that 
 \begin{itemize}
- \item $\gen(d)$ -  a randomized algorithm that outputs an SRS \srs0.
- \item $\com(f,\srs0)$ - that given a polynomial $f\in \polysofdeg{d}$ returns a commitment \cm to $f$.
- \item A public coin protocol  \open between parties \prvpc and \verpc. \prvpc is given $ f_1,\ldots,f_k \in \polysofdeg{d}$. \prvpc and \verpc are both given  $t=\poly$, a subset $T=\set{z_1,\ldots,z_t}\subset \F$, subsets $S_1,\ldots,S_k \subset T$,  $\cm_1,\ldots,\cm_k$ - the alleged commitments to $f_1,\ldots,f_k$, \sett{s_{i,z}}{i\in [k],z\in S_i} - the alleged correct openings \sett{f_i(z)}{i\in [k], z\in S_i}. At the end of the protocol \verpc outputs \acc or \rej. 
-\end{itemize}
+ \item $\gen(d)$ -  is a randomized algorithm that given positive integer $d$ outputs a structured reference string (SRS) \srs0.
+ \item $\com(f,\srs0)$ - is an algorithm that given a polynomial $f\in \polysofdeg{d}$ and an output \srs0 of $\gen(d)$  returns a commitment \cm to $f$.
+ \item \open is a public coin protocol between parties \prvpc and \verpc. \prvpc is given $ f_1,\ldots,f_k \in \polysofdeg{d}$. \prvpc and \verpc are both given
+ 
+ \begin{enumerate}
+  \item  positive integers $d,t=\poly$,
+  \item  $\srs0=\gen(d)$,
+  \item a subset $T=\set{z_1,\ldots,z_t}\subset \F$,
+  \item subsets $S_1,\ldots,S_k \subset T$,
+  \item $\cm_1,\ldots,\cm_k$ - the alleged commitments to $f_1,\ldots,f_k$,
+  \item \sett{s_{i,z}}{i\in [k],z\in S_i} - the alleged correct openings \sett{f_i(z)}{i\in [k], z\in S_i}.  
+ \end{enumerate}
+ At the end of the protocol \verpc outputs \acc or \rej;
 such that
 \begin{itemize}
- \item \textbf{Completeness:} Fix any $k,t=\poly$, $T=\set{z_1,\ldots,z_t}\subset \F$, $S_1,\ldots,S_k \subset T$, $f_1,\ldots,f_k\in polysofdeg{d}$. Suppose that for each $i\in [k]$, $\cm_i = \com(f_i,\srs0)$, and for each $i\in [k],z \in S_i, s_{i,z} = f_i(z)$.  Then if \prvpc follows \open correctly with these values, \verpc outputs \acc with probability one.
- \item \textbf{Knowledge soundness in the algebraic group model:} There exists an efficient \ext such that for any algebraic adversary \adv the probability of \adv winning the following game is \negl over the randomness of \adv and \gen.
+ \item \textbf{Completeness:} Fix any $k,t=\poly$, $T=\set{z_1,\ldots,z_t}\subset \F$, $S_1,\ldots,S_k \subset T$, $f_1,\ldots,f_k\in \polysofdeg{d}$. Suppose that for each $i\in [k]$, $\cm_i = \com(f_i,\srs0)$, and for each $i\in [k]$ and $z \in S_i$ we have  $s_{i,z} = f_i(z)$.  Then if \prvpc follows \open correctly with these values, \verpc outputs \acc with probability one.
+ \item \textbf{Knowledge soundness in the algebraic group model:} There exists an efficient \ext such that for any algebraic adversary \adv and any choice of $d=\poly$ the probability of \adv winning the following game is \negl over the randomness of \adv and \gen.
  \begin{enumerate}
-  \item Given \srs0, \adv outputs $t,\cm_1,\ldots,\cm_k\in \G1$.
+  \item Given $d$ and $\srs0=\gen(d)$, \adv outputs $\cm_1,\ldots,\cm_k\in \G1$.
   \item \ext, given access to the messages of \adv during the previous step, outputs $f_1,\ldots,f_k \in \polysofdeg{d}$.
   \item \adv outputs $T=\set{z_1,\ldots,z_t}\subset \F$, $S_1,\ldots,S_k \subset T$,   \F$, \sett{s_{i,z}}{i\in [k],z\in S_i}$.
   \item \adv takes the part of \prvpc in the protocol \open with the inputs
-  $\cm_1,\ldots,\cm_k,T, S_1,\ldots,S_k, \set{s_{i,z}}$.
+  $\cm_1,\ldots,\cm_k$,$T, S_1,\ldots,S_k,$  $\set{s_{i,z}}$.
   \item $\adv$ wins if 
   \begin{itemize} 
    \item \verpc outputs \acc at the end of the protocol.
-   \item For some $i\in [k], z\in S_i$, $s_{i,z}\neq f_i(z)$.
+   \item For some $i\in [k]$ and  $z\in S_i$, $s_{i,z}\neq f_i(z)$.
   \end{itemize}
 
  \end{enumerate}
 
 \end{itemize}
+\end{itemize}
 \end{dfn}
+
+
+\section{The new scheme}\label{sec:main}
 
 
 
 % It is in fact a slightly simpler scheme than in \cite{sonic} because, as explained in the introduction, there is no need to deal with holes in the allowed range of degrees.
-We first state the following straightforward claim will allow us to efficiently ``uniformize'' checks on different evaluation points.
+We first state the following straightforward claim that allows us to efficiently ``uniformize'' checks on different evaluation points.
 \begin{claim}\label{clm:div}
  Fix subsets $S\subset T\subset \F$, and polynomials $f,r \in \polysofdeg{d}$.
  Then $f(z)=r(z)$ for each $z\in S$ if and only if 
@@ -587,30 +607,42 @@ We first state the following straightforward claim will allow us to efficiently 
  
 \end{claim}
 
+
+
 \begin{proof}
  $Z_T$ divides $Z_{T\setminus S}\cdot (f(X)-r(X))$ if and only if 
  $Z_{T\setminus S}\cdot (f(X)-r(X))$ vanishes on $T$ if and only if
  $(f(X)-r(X))$ vanishes on $S$.
 \end{proof}
 
-We describe the following scheme based on \cite{kate}.
+We also use the following claim, which is part of Claim 4.6 in \cite{plonk} where a proof of it can be found.
+\begin{claim}\label{clm:div_sum}
+ Fix $F_1,\ldots,F_k \in \polysofdeg{n}$. Fix $Z\in \polysofdeg{n}$ that decomposes to distinct linear factors over \F. 
+ Suppose that for some $i\in [k]$, $Z\nmid F_i$.
+ Then, e.w.p $k/|\F|$ over uniform $a\in \F$, $Z$ doesn't divide
+ \[G\defeq \sum_{j=1}^k a^j \cdot F_j.\]
+
+\end{claim}
+
+
+
+We are ready to describe our PCS.
 
 \begin{enumerate}
  \item $\gen(d)$ - choose uniform $x\in \F$. Output $\srs0 =(\enc1{1},\enc1{x},\ldots,\enc1{x^{d-1}},\enc2{1},\enc2{x},\ldots,\enc2{x^t})$.
  \item $\com(f,\srs0) \defeq \enc1{f(x)}$.
- \item For $i\in [k]$,
- 
+ \item  
  \noindent
- $\open(\set{\cm_i},T=\set{z_1,\ldots,z_t}\subset \F,\sett{S_i\subset T}{i\in [k]},\sett{s_{i,z}}{i\in [k],z\in S_i})$:
+ $\open\left(d,t,\sett{\cm_i}{i\in [k]},T=\set{z_1,\ldots,z_t}\subset \F,\sett{S_i\subset T}{i\in [k]},\sett{s_{i,z}}{i\in [k],z\in S_i}\right)$:
  \begin{enumerate}
   \item \verpc sends random $\gamma\in \F$.
-  \item \verpc and \prvpc both compute the polynomials \sett{r_i}{i\in [k]}
+  \item For $i\in [k]$, \verpc and \prvpc both compute the polynomials \sett{r_i}{i\in [k]}
   such that $r_i\in \polysofdeg{|S_i|}$ satisfies $r_i(z) = s_{i,z}$ for each $z\in S_i$. 
  \item \prvpc computes the polynomial
  \[h(X)\defeq \sum_{i=1}^t \gamma^{i-1}\cdot \frac{f_i(X)-r_i(X)}{Z_{S_i(X)}}  \]
  and using \srs0 computes and sends $W\defeq \enc1{h(x)}$.
 % \[]
- \item\label{step:computeW} \verpc computes for each $i\in [k]$, $Z_i \defeq \enc2{Z_{T\setminus S_i}}$. 
+ \item\label{step:computeW} \verpc computes for each $i\in [k]$, $Z_i \defeq \enc2{Z_{T\setminus S_i}(x)}$. 
  \item \verpc computes
  \[F\defeq \sum_{i\in [k]} \gamma^{i-1} \cdot e(\cm_i-\enc1{r_i(x)}, Z_i).\]
  \item \verpc outputs \acc if and only if
@@ -628,13 +660,13 @@ We describe the following scheme based on \cite{kate}.
  \ext, who is given the coefficients \set{a_{i,j}}, simply outputs the polynomials
  \[f_i(X)\defeq \sum_{j=0}^{d-1} a_{i,j} \cdot X^j.\]
  \adv now outputs $T=\set{z_1,\ldots,z_t}\subset \F,\sett{S_i\subset T}{i\in [k]},\sett{s_{i,z}}{i\in [k],z\in S_i}$.
- Define, for each $i\in [k]$ $r_i\in \polysofdeg{|S_i|}$ such that $r_i(z)= s_{i,z}$ for each $z\in S_i$.
-  Assume that for some $i'\in [k],z'\in S_i$, $f_{i'}(z')\neq r_{i'}(z')=s_{i',z'}$. We show that for any strategy of \adv from this point, \verpoly outputs \acc w.p \negl.
+ Define, for each $i\in [k]$, $r_i\in \polysofdeg{|S_i|}$ such that $r_i(z)= s_{i,z}$ for each $z\in S_i$.
+  Assume that for some $i^*\in [k],z^*\in S_{i^*}$, we have $f_{i^*}(z^*)\neq r_{i^*}(z^*)$. We show that for any strategy of \adv from this point, \verpoly outputs \acc w.p. \negl.
  
  In the first step of \open, \verpoly chooses a random $\gamma \in \F$.
  Let
  \[f(X)\defeq \sum_{i\in [t]} \gamma^{i-1} \cdot Z_{T\setminus S_i}\cdot (f_i(X)-r_i(X)).\]
- We know from Claim \ref{clm:div} that $F_{i'} \defeq  Z_{T\setminus S_{i'}}\cdot (f_{i'}(X)-r_{i'}(X))$ isn't divisible by $Z_T$. Thus using the derandomized version of Claim 4.6 from \plonk, we know that e.w.p $k/|\F|$ over $\gamma$, $f$ isn't divisble by $Z_T$.
+ We know from Claim \ref{clm:div} that $F_{i^*} \defeq  Z_{T\setminus S_{i^*}}\cdot (f_{i^*}(X)-r_{i^*}(X))$ isn't divisible by $Z_T$. Thus, using Claim \ref{clm:div_sum}, we know that e.w.p $k/|\F|$ over $\gamma$, $f$ isn't divisble by $Z_T$.
   Now \adv outputs $W=\enc1{H(x)}$ for some $H\in\polysofdeg{d}$.
  According to Lemma \ref{lem:AGManalysis}, it suffices to upper bound the probability that the ideal check corresponding to the real pairing check in the protocol passes. It has the form
  \[f(X) \equiv H(X)Z_T(X).\]
@@ -648,27 +680,112 @@ We describe the following scheme based on \cite{kate}.
  
  We summarize the efficiency properties of the scheme.
  
- \begin{lemma}\label{lem:kate}
+ \begin{lemma}\label{lem:multikate}
  Fix positive integer $d$.
   There is a $d$-polynomial commitment scheme \PCscheme such that
   \begin{enumerate}
    \item For $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f)$ requires $n$ \G1-exponentiations.
    \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$, denote by $k^*$ the number of distinct subsets  \set{S^*_1,\ldots,S^*_{k^*}} in \set{S_i}; and 
-   let $K\defeq t+1 + \sumi{k^*} t-|S^*_i|+1$.
+   let $K\defeq t+ \sumi {k^*}\left( t-|S^*_i|\right)$.
    and denote $d^* \defeq \max\sett{\deg(f_i)}{i\in [k]}$.
    Let $\cm_i = \com(f_i)$.
-   Then \open(\set{cm_i},\set{f_i},T,\set{S_i},\set{s_{i,z}})  requires
+   Then \open(\set{cm_i},\set{f_i},T,\set{S_i\subset T},\set{s_{i,z}})  requires
    \begin{enumerate}
    \item A single \G1 element to be passed from \prvpoly to \verpoly.
+    \item At most $d^*$ \G1-exponentiations of \prvpoly.
+    \item $k-1$ \G1-exponentiations, $K$ \G2-exponentiations  and $k^*+1$ pairings of \verpoly.
+    \end{enumerate}
+\end{enumerate}
+
+ \end{lemma}
+
+\section{Reducing verifier operations at the expense of proof length}
+We describe a variant of the scheme of Section \ref{sec:main} where we eliminate the verifier's \G2 operations and reduce the number of pairings to two. This comes at the cost of extra prover communication and computation, however the scheme is still gives significant savings in proof length compared to previous results, when the numer of distinct evaluation subsets $k^*$  is small.
+
+\begin{lemma}\label{lem:multikateG1}
+ Fix positive integer $d$.
+  There is a $d$-polynomial commitment scheme \PCscheme such that
+  \begin{enumerate}
+   \item For $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f)$ requires $n$ \G1-exponentiations.
+   \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$, denote by $k^*$ the number of distinct subsets  \set{S^*_1,\ldots,S^*_{k^*}} in \set{S_i}; and 
+   let $K\defeq t-1 + \sumi {k^*}\left( t-|S^*_i|-1\right)$.
+   and denote $d^* \defeq \max\sett{\deg(f_i)}{i\in [k]}$.
+   Let $\cm_i = \com(f_i)$.
+   Then \open(\set{cm_i},\set{f_i},T,\set{S_i\subset T},\set{s_{i,z}})  requires
+   \begin{enumerate}
+   \item Two  \G1 elements and $k^*$ \F elements to be passed from \prvpoly to \verpoly.
     \item At most $d^*+1$ \G1-exponentiations of \prvpoly.
-    \item $k$ \G1-exponentiations, $K$ \G2-exponentiations  and $k^*+1$ pairings of \verpoly.
+    \item $k-k^*$ \G1-exponentiations, $K$ \G2-exponentiations  and $k^*+1$ pairings of \verpoly.
     \end{enumerate}
 \end{enumerate}
 
  \end{lemma}
 
 
+\begin{enumerate}
+ \item $\gen(d)$ - choose uniform $x\in \F$. Output $\srs0 =(\enc1{1},\enc1{x},\ldots,\enc1{x^{d-1}},\enc2{1},\enc2{x})$.
+ \item $\com(f,\srs0) \defeq \enc1{f(x)}$.
+ \item  
+ \noindent
+ $\open\left(d,t,\sett{\cm_i}{i\in [k]},T=\set{z_1,\ldots,z_t}\subset \F,\sett{S_i\subset T}{i\in [k]},\sett{s_{i,z}}{i\in [k],z\in S_i}\right)$:
+ \begin{enumerate}
+  \item \verpc sends random $\gamma\in \F$.
+  \item For $i\in [k]$, \verpc and \prvpc both compute the polynomials \sett{r_i}{i\in [k]}
+  such that $r_i\in \polysofdeg{|S_i|}$ satisfies $r_i(z) = s_{i,z}$ for each $z\in S_i$. 
+ \item \prvpc computes the polynomial
+ \[g(X)\defeq \sum_{i=1}^t \gamma^{i-1}\cdot Z_{T\setminus S_i}(X)\cdot (f_i(X)-r_i(X)).\]
+ and using \srs0 computes and sends $W\defeq \enc1{h(x)}$.
+% \[]
+ \item \verpc sends random $z\in \F$.
+ \item Let $S'_1,\ldots S'_{k^*}$ be the distinct subsets among $S_1,\ldots,S_k$. ``Split'' $g$ according to these distinct subsets; i.e. for $i\in [k^*]$
+ \[g_i(X) \defeq \sum_{j\in [k], S_j=S'_i}^t \gamma^{j-1}\cdot Z_{T\setminus S_j}(X)\cdot (f_j(X)-r_j(X)).  \]
+ Note that $g(X)=\sum_{i\in [k^*]} g_i(X)$.
+ 
+ \prvpc sends the values $t_i \defeq g_i(z)$ for $i\in [k^*]$.
 
+ \item \prvpc computes the polynomial
+ \[h(X)\defeq g(X)/Z_T(X) =    \sum_{i\in [k^*]}\frac{g_i(X)}{Z_{S_i(X)}} . \]
+ and using \srs0 computes and sends $W\defeq \enc1{h(x)}$.
+
+ \item\label{step:computeW} \verpc computes for each $i\in [k]$, $Z_i \defeq \enc2{Z_{T\setminus S_i}(x)}$. 
+ \item \verpc computes
+ \[F\defeq \sum_{i\in [k]} \gamma^{i-1} \cdot e(\cm_i-\enc1{r_i(x)}, Z_i).\]
+ \item \verpc outputs \acc if and only if
+ \[ F = e(W,\enc2{Z_T(x)}).\]
+ \end{enumerate}
+
+ We argue knowledge soundness for the above protocol. More precisely, we argue the existence of an efficient \ext such that an algebraic adversary \adv can only win the KS game w.p. \negl.
+ %when restricting itself to choosing $z=z_1=\ldots=z_t$.
+ 
+ 
+ Let \adv be such an algebraic adversary.
+ 
+ \adv begins by outputting $\cm_1,\ldots,\cm_k\in \G1$.
+ Each $\cm_i$ is a linear combination $\sum_{j=0}^{d-1} a_{i,j} \enc1{x^j}$.
+ \ext, who is given the coefficients \set{a_{i,j}}, simply outputs the polynomials
+ \[f_i(X)\defeq \sum_{j=0}^{d-1} a_{i,j} \cdot X^j.\]
+ \adv now outputs $T=\set{z_1,\ldots,z_t}\subset \F,\sett{S_i\subset T}{i\in [k]},\sett{s_{i,z}}{i\in [k],z\in S_i}$.
+ Define, for each $i\in [k]$, $r_i\in \polysofdeg{|S_i|}$ such that $r_i(z)= s_{i,z}$ for each $z\in S_i$.
+  Assume that for some $i^*\in [k],z^*\in S_{i^*}$, we have $f_{i^*}(z^*)\neq r_{i^*}(z^*)$. We show that for any strategy of \adv from this point, \verpoly outputs \acc w.p. \negl.
+ 
+ In the first step of \open, \verpoly chooses a random $\gamma \in \F$.
+ Let
+ \[f(X)\defeq \sum_{i\in [t]} \gamma^{i-1} \cdot Z_{T\setminus S_i}\cdot (f_i(X)-r_i(X)).\]
+ We know from Claim \ref{clm:div} that $F_{i^*} \defeq  Z_{T\setminus S_{i^*}}\cdot (f_{i^*}(X)-r_{i^*}(X))$ isn't divisible by $Z_T$. Thus, using Claim \ref{clm:div_sum}, we know that e.w.p $k/|\F|$ over $\gamma$, $f$ isn't divisble by $Z_T$.
+  Now \adv outputs $W=\enc1{H(x)}$ for some $H\in\polysofdeg{d}$.
+ According to Lemma \ref{lem:AGManalysis}, it suffices to upper bound the probability that the ideal check corresponding to the real pairing check in the protocol passes. It has the form
+ \[f(X) \equiv H(X)Z_T(X).\]
+ The check passing implies that
+ $f(X)$ is divisible by $Z_T$. Thus the ideal check can only pass w.p. $k/|\F|= \negl$ over the randomness of \verpoly, which implies the same thing for the real check according to Lemma \ref{lem:AGManalysis}.
+ 
+ 
+ \end{enumerate}
+
+ 
+
+
+\section*{Acknowledgements}
+Part of this research was conducted while the second author was supported by Protocol Labs.
 \bibliographystyle{alpha}
 \bibliography{references}
     
