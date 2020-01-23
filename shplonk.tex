@@ -378,6 +378,7 @@
 \newcommand{\cmark}{\ding{51}}%
 \newcommand{\xmark}{\ding{55}}%
 \newcommand{\plonk}{\ensuremath{\mathtt{PLONK}}\xspace}
+\newcommand{\shplonk}{\ensuremath{\mathtt{SHPLONK}}\xspace}
 \newcommand{\marlin}{\ensuremath{\mathsf{Marlin}}\xspace}
 \newcommand{\fractal}{\ensuremath{\mathsf{Fractal}}\xspace}
 \newcommand{\Rsnark}{\R{\snark}}
@@ -409,7 +410,12 @@ Several works \cite{sonic,auroralight,marlin,plonk} (starting from \cite{sonic})
 
 
 
-In this paper, we give a scheme where a single group element can be the opening proof for multiple evaluation points and polynomials.
+In this paper, we give two PCS schemes for multiple evaluation points and polynomials.
+\begin{itemize}
+ \item In our first scheme the opening proof is only a single \G1 element, but verifier operations are considerably heavier than previous variants of \cite{kate} when the number of distinct evaluation points is large (cf. Lemma \ref{lem:multikate}).
+\item In our second scheme th opening proof is two \G1 elements, and the verifier complexity is slightly better than previous multipoint variants of \cite{kate} (cf. Lemma \ref{lem:multikateG1}).
+ \end{itemize}
+
 We compare the performance of our PCS compared to a more straightforward batched version of the \cite{kate} scheme as in \cite{plonk}.
 For simplicity, we look at the restricted case where we want to open $t$ polynomials all with the same degree bound $n$, each at one \emph{distinct} point. See Lemma \ref{lem:multikate} for the more detailed efficiency properties in the general case (where each polynomial is opened at a subset of points, and the subsets may repeat).
 \begin{table}[!htbp]
@@ -420,7 +426,9 @@ For simplicity, we look at the restricted case where we want to open $t$ polynom
 	& \thead{SRS size} & \thead{prover work} & \thead{proof\\ length} & \thead{verifier work} \\ \hline
 		\kate as in \cite{plonk}
 		         & $n$ \G1, $2$ \G2  & $t\cdot n$ \G1, $O(t\cdot n\log n)$ \F &   $t$ \G1 &  $3t-2$ \G1, $2$ \textbf{P}\\ \hline
-		This work     & $n$ \G1, $t+1$ \G2 &   $n$ \G1, $O(t\cdot n + n\log n)$ \F  & $1$ \G1 & $t-1$ \G1, $2t$ \G2, $t+1$ \textbf{P}   \\ \hline
+		This work, ver. 1     & $n$ \G1, $t+1$ \G2 &   $n$ \G1, $O(t\cdot n + n\log n)$ \F  & $1$ \G1 & $t-1$ \G1, $2t$ \G2, $t+1$ \textbf{P}   \\ \hline
+	This work, ver. 2     & $n$ \G1, $2$ \G2 &   $2n$ \G1, $O(t\cdot n + n\log n)$ \F  & $2$ \G1 & $2t+1$ \G1, $2$ \textbf{P}   \\ \hline
+
 	\end{tabular}
 \end{adjustbox}
 \label{table:prover-work}
@@ -434,7 +442,7 @@ For simplicity, we look at the restricted case where we want to open $t$ polynom
 The \plonk proving system \cite{plonk}  allows generating proofs of knowledge for assignments
 to fan-in two arithmetic circuits with a universal and updatable SRS (see the paragraph on this topic in Section \ref{sec:terminology}). Most of the prover computation involves committing to several polynomials and opening them at two distinct evaluation points. Plugging in our PCS to \plonk allows saving in proof length and prover work related to the opening proof of the second evaluation point (we do not give full details, but all that is needed is repreating the transformation of Lemma 4.7 in \cite{plonk} using the PCS of Lemma \ref{lem:multikate} here instead of the PCS used there to obtain the new result).
 
-We compare the \plonk scheme when using the  \cite{kate}-based PCS in \cite{gwc} and the PCS of this paper in Table \ref{table:plonk}. As in \cite{plonk} we present look at two versions of \plonk where one optimizes fast proving, and the other small proof length.
+We compare the \plonk scheme when using the  \cite{kate}-based PCS in \cite{plonk} and the first PCS of this paper in Table \ref{table:plonk}. As in \cite{plonk} we present look at two versions of \plonk where one optimizes fast proving, and the other small proof length.
 
 \begin{table}[!htbp]
 	\caption{Comparison of \plonk efficiency for fan-in two circuit with $n$  gates.}
@@ -452,7 +460,8 @@ We compare the \plonk scheme when using the  \cite{kate}-based PCS in \cite{gwc}
 \label{table:plonk}
 \end{table} 
 
-
+\paragraph{\shplonk?}
+Our second PCS does not give interesting tradeoffs for \plonk as two evaluation points are not enough for its advantages to ``kick in''. However, in a scenario where constraints between \emph{more than two} evaluation points are used, e.g. \cite{slonk}, the advantages of both our new schemes will become more prominent. Thus, the PCSs of this paper encourage designing constraint systems using multiple Shifts and Permuations over Largange bases for Oecumenical arguments of Knowledge.
 \section{Preliminaries}
 
 
@@ -710,7 +719,7 @@ We describe a variant of the scheme of Section \ref{sec:main} where we eliminate
   There is a $d$-polynomial commitment scheme \PCscheme such that
   \begin{enumerate}
    \item For $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f)$ requires $n$ \G1-exponentiations.
-   \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$, denote by $k^*$ the number of distinct subsets  \set{S^*_1,\ldots,S^*_{k^*}} in \set{S_i}; and 
+   \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$, ; and 
    let $K\defeq t+ 1 + \sumi {k}\left( |S_i|\right)$.
    and denote $d^* \defeq \max\sett{\deg(f_i)}{i\in [k]}$.
    Let $\cm_i = \com(f_i)$.
@@ -725,6 +734,8 @@ We describe a variant of the scheme of Section \ref{sec:main} where we eliminate
  \end{lemma}
 
 
+ We present the PCS.
+ 
 \begin{enumerate}
  \item $\gen(d)$ - choose uniform $x\in \F$. Output $\srs0 =(\enc1{1},\enc1{x},\ldots,\enc1{x^{d-1}},\enc2{1},\enc2{x})$.
  \item $\com(f,\srs0) \defeq \enc1{f(x)}$.
