@@ -15,12 +15,12 @@
 
 \usepackage[utf8]{inputenc} % set input encoding (not needed with xelatex)
 \usepackage[strict]{changepage}
-    
+
     %%% examples of article customizations
     % these packages are optional, depending whether you want the features they provide.
     % see the latex companion or other references for full information.
-    
-    
+
+
     %%% page dimensions
 \usepackage{geometry} % to change the page dimensions
 \geometry{a4paper} % or letterpaper (us) or a5paper or....
@@ -28,7 +28,7 @@
     % \geometry{landscape} % set up the page for landscape
     %   read geometry.pdf for detailed page layout information
  \usepackage{numdef}
-   
+
 \usepackage{graphicx} % support the \includegraphics command and options
     % some of the article customisations are relevant for this class
 \usepackage{amsmath,amsthm}
@@ -36,9 +36,9 @@
 \usepackage{amssymb} % \therefore
 \usepackage{hyperref}
 \usepackage{cryptocode}
-\usepackage{framed} 
+\usepackage{framed}
     % \usepackage[parfill]{parskip} % activate to begin paragraphs with an empty line rather than an indent
-    
+
     %%% packages
 \usepackage{booktabs} % for much better looking tables
 \usepackage{array} % for better arrays (eg matrices) in maths
@@ -56,20 +56,20 @@
 \renewcommand\theadalign{bc}
 \renewcommand\theadfont{\bfseries}
 \renewcommand\theadgape{\Gape[4pt]}
-  
+
     %%% headers & footers
 \usepackage{fancyhdr} % this should be set after setting up the page geometry
 \pagestyle{fancy} % options: empty , plain , fancy
 \renewcommand{\headrulewidth}{0pt} % customise the layout...
 \lhead{}\chead{}\rhead{}
 \lfoot{}\cfoot{\thepage}\rfoot{}
-    
-    
+
+
     %%% section title appearance
 \usepackage{sectsty}
 \allsectionsfont{\sffamily\mdseries\upshape} % (see the fntguide.pdf for font help)
     % (this matches context defaults)
-    
+
     %%% toc (table of contents) appearance
 \usepackage[nottoc,notlof,notlot]{tocbibind} % put the bibliography in the toc
 \usepackage[titles,subfigure]{tocloft} % alter the style of the table of contents
@@ -88,15 +88,15 @@
 %\newcommand{\authorname}}
 \newcommand{\company}{}
 \title{ \bf \papertitle \\[0.72cm]}
-\author{Justin Drake \\ \tt{Ethereum Foundation} \and  Ariel Gabizon\\ \tt{AZTEC Protocol}  \and Zachary J. Williamson\\ \tt{AZTEC Protocol}} 
+\author{Justin Drake \\ \tt{Ethereum Foundation} \and  Ariel Gabizon\\ \tt{AZTEC Protocol}  \and Zachary J. Williamson\\ \tt{AZTEC Protocol}}
 
 % 	\large{\authorname} \\[0.5cm] \large{\company}
 % 	\\ {DRAFT}
 %}
     %\date{} % activate to display a given date or no date (if empty),
-  
-           % otherwise the current date is printed 
-	
+
+           % otherwise the current date is printed
+
 \ProvidesPackage{numdef}
 
 %% Ariel Macros:
@@ -196,9 +196,9 @@
 \num\newcommand{\out2}[1]{\ensuremath{\ex2{\powervec{#1}{d}}}\xspace}
  \newcommand{\nizk}[2]{\ensuremath{\mathrm{NIZK}(#1,#2)}\xspace}% #2 is the hash concatenation input
  \newcommand{\verifynizk}[3]{\ensuremath{\mathrm{VERIFY\mhyphen NIZK}(#1,#2,#3)}\xspace}
-\newcommand{\protver}{protocol verifier\xspace} 
+\newcommand{\protver}{protocol verifier\xspace}
 \newcommand{\mulgroup}{\ensuremath{\F^*}\xspace}
-\newcommand{\lag}[1]{\ensuremath{L_{#1}}\xspace} 
+\newcommand{\lag}[1]{\ensuremath{L_{#1}}\xspace}
 \newcommand{\sett}[2]{\ensuremath{\set{#1}_{#2}}\xspace}
 \newcommand{\omegaprod}{\ensuremath{\alpha_{\omega}}\xspace}
 \newcommand{\lagvec}[1]{\ensuremath{\mathrm{LAG}_{#1}}\xspace}
@@ -284,7 +284,7 @@
 \newcommand{\PC}{\ensuremath{\mathscr{P}}\xspace}
 \newcommand{\permscheme}{\ensuremath{\sigma_\mathscr{P}}\xspace}
 
-	
+
 \newcommand{\selleft}{\ensuremath{\mathbf{q_L}}\xspace}
 \newcommand{\selright}{\ensuremath{\mathbf{q_R}}\xspace}
 \newcommand{\selout}{\ensuremath{\mathbf{q_O}}\xspace}
@@ -326,7 +326,7 @@
 \newcommand{\selmultcomm}{\ensuremath{[q_\mathsf{M}]_1}\xspace}
 
 \newcommand{\multlinecomment}[1]{\directlua{-- #1}}
-    
+
 
 \newtheorem{lemma}{Lemma}[section]
 \newtheorem{thm}[lemma]{Theorem}
@@ -395,7 +395,7 @@ As a sample application we ``plug in'' this scheme into the \plonk proving syste
 
 \section{Introduction}
 
-Polynomial commitment schemes (PCS) are an important primitive in arguably all\footnote{While QAP based proving systems like \cite{pinocchio,groth16} are not traditionally formulated as using a PCS, they can be interpreted as using a PCS that also forces the committed polynomial to be in a certain subspace. This is related to the linear interactive proof framework of  \cite{bciop}.} practical succinct proving systems (see \cite{marlin,plonk,supersonic} for formalizations of their role).  They can ``force'' a prover to answer verifier queries according to a fixed polynomial of bounded degree.
+Polynomial commitment schemes (PCS) are an important primitive in arguably all\footnote{While QAP-based proving systems like \cite{pinocchio,groth16} are not traditionally formulated as using a PCS, they can be interpreted as using a PCS that also forces the committed polynomial to be in a certain subspace. This is related to the linear interactive proof framework of  \cite{bciop}.} practical succinct proving systems (see \cite{marlin,plonk,supersonic} for formalizations of their role).  They can ``force'' a prover to answer verifier queries according to a fixed polynomial of bounded degree.
 
 The use of a PCS typically starts by an initial prover message $\com(f)$ corresponding to the commitment to a polynomial $f$. Then, in the more straightforward use of this primitive, whenever the prover sends a value $s\in \F$ which is allegedly the value $f(z)$ for $z$ known to the verifier, the prover will send a corresponding ``opening proof'' $\pi$ that this is indeed the case. When a PCS is used in this way for several polynomials and several evaluation points, prover run time and proof length will increase with each of these opening proofs.
 
@@ -403,9 +403,9 @@ The use of a PCS typically starts by an initial prover message $\com(f)$ corresp
 
 \subsection{Previous work and our results}
 
-We take the PCS of Kate, Zaverucha and Goldberg \cite{kate} as our starting point. Their scheme is pairing based and an opening proof $\pi$ consists of a single $\G1$ group element. We ask whether we can get a variant of this scheme where a single $\G1$ element can prove correctness of multiple polynomial evaluations.
+We take the PCS of Kate, Zaverucha and Goldberg \cite{kate} as our starting point. Their scheme is pairing-based and an opening proof $\pi$ consists of a single $\G1$ group element. We ask whether we can get a variant of this scheme where a single $\G1$ element can prove correctness of multiple polynomial evaluations.
 
-Several works \cite{sonic,auroralight,marlin,plonk} (starting from \cite{sonic}) have noticed that it possible to modify the PCS of \cite{kate} in the random oracle model to allow for one opening proof for several polynomials \emph{at the same point $z\in \F$} .
+Several works \cite{sonic,auroralight,marlin,plonk} (starting from \cite{sonic}) have noticed that it is possible to modify the PCS of \cite{kate} in the random oracle model to allow for one opening proof for several polynomials \emph{at the same point $z\in \F$} .
 \cite{kate} give in their paper a less known version of their scheme allowing for one opening proof for one polynomial at several evaluation points.
 
 
@@ -413,7 +413,7 @@ Several works \cite{sonic,auroralight,marlin,plonk} (starting from \cite{sonic})
 In this paper, we give two PCS schemes for multiple evaluation points and polynomials.
 \begin{itemize}
  \item In our first scheme the opening proof is only a single \G1 element, but verifier operations are considerably heavier than previous variants of \cite{kate} when the number of distinct evaluation points is large (cf. Lemma \ref{lem:multikate}).
-\item In our second scheme the opening proof is two \G1 elements, and the verifier complexity is slightly better than previous multipoint variants of \cite{kate} (cf. Lemma \ref{lem:multikateG1}).
+\item In our second scheme the opening proof is 2 \G1 elements, and the verifier complexity is slightly better than previous multipoint variants of \cite{kate} (cf. Lemma \ref{lem:multikateG1}).
  \end{itemize}
 
 We compare the performance of our PCSs to a more straightforward batched version of the \cite{kate} scheme as in \cite{plonk}.
@@ -432,7 +432,7 @@ For simplicity, we look at the restricted case where we want to open $t$ polynom
 	\end{tabular}
 \end{adjustbox}
 \label{table:prover-work}
-\end{table} 
+\end{table}
 
 
 
@@ -458,20 +458,20 @@ We compare the \plonk scheme when using the  \cite{kate}-based PCS in \cite{plon
 		\end{tabular}
 \end{adjustbox}
 \label{table:plonk}
-\end{table} 
+\end{table}
 
 \paragraph{\shplonk?}
 Our second PCS does not give interesting tradeoffs for \plonk as two evaluation points are not enough for its advantages to ``kick in''. However, in a scenario where constraints between \emph{more than two} evaluation points are used, e.g. \cite{slonk}, the advantages of both of our new schemes will become more prominent. Thus, the PCSs of this paper encourage designing constraint systems using multiple SHifts and Permutations over Largange bases for Oecumenical Noninteractive arguments of Knowledge.
 \section{Preliminaries}
 
 
-\subsection{Terminology and Conventions}\label{sec:terminology}
+\subsection{Terminology and conventions}\label{sec:terminology}
 We assume our field \F is of prime order.
 %We assume we have a
 %multiplicative subgroup $H \subset F$ of size $|H| = n$ where $n$ is the number of constraints in our R1CS.
 %and denote for simplicity the elements of H as H = {1, . . . , m}.
 %We assume the number of private variables n is equal to m.
-We denote by \polysofdeg{d} the set of univariate polynomials over \F of degree smaller than d. 
+We denote by \polysofdeg{d} the set of univariate polynomials over \F of degree smaller than d.
 We assume all algorithms described receive as an implicit parameter the security parameter $\lambda$.
 
 Whenever we use the term “efficient”, we mean an algorithm running in time \poly. Furthermore,
@@ -491,8 +491,8 @@ We often denote by $[n]$ the integers \set{1,\ldots,n}.
 % the output of $\obgen(\lambda)$.
 We use the acronym e.w.p for ``except with probability''; i.e. e.w.p $\gamma$ means with probability \emph{at least} $1-\gamma$.
 
-\paragraph{universal SRS-based public-coin protocols}
-We describe public-coin (meaning the verifier messages are uniformly chosen) interactive protocols between a prover and verifier; when deriving results for non-interactive protocols, we implicitly assume we can get a proof length equal to the total communication of the prover, using the Fiat-Shamir transform/a random oracle. Using this reduction between interactive and non-interactive protocols, we can refer to the ``proof length'' of an interactive protocol. 
+\paragraph{Universal SRS-based public-coin protocols}
+We describe public-coin (meaning the verifier messages are uniformly chosen) interactive protocols between a prover and verifier; when deriving results for non-interactive protocols, we implicitly assume we can get a proof length equal to the total communication of the prover, using the Fiat-Shamir transform/a random oracle. Using this reduction between interactive and non-interactive protocols, we can refer to the ``proof length'' of an interactive protocol.
 
 We allow our protocols to have access to a structured reference string (SRS) that can be derived in deterministic \poly-time from an ``SRS of monomials'' of the form
 \sett{\enc1{x^i}}{a\leq i \leq b}, \sett{\enc2{x^i}}{c\leq i \leq d}, for uniform $x\in \F$,
@@ -502,7 +502,7 @@ It then follows from Bowe et al. \cite{SecondMPC} that the required SRS can be d
 For notational simplicity, we sometimes use the SRS \srs0 as an implicit parameter in protocols, and do not explicitly write it.
 
 \subsection{Analysis in the AGM model}\label{subsec:AGM}
-For security analysis we will use the Algebraic Group Model of Fuchsbauer, Kiltz and Loss\cite{AGM}.
+For security analysis we will use the Algebraic Group Model of Fuchsbauer, Kiltz and Loss \cite{AGM}.
 In our protocols, by an \emph{algebraic adversary} \adv in an SRS-based protocol we mean a \poly-time algorithm which satisfies the following.
 \begin{itemize}
  \item For $i\in \set{1,2}$, whenever \adv outputs an element $A\in \Gi$, it also outputs a vector $v$ over \F such that $A = <v,\srsi>$.
@@ -533,14 +533,14 @@ The following lemma is inspired by \cite{AGM}'s analysis of \cite{groth16},
 and tells us that for soundness analysis against algebraic adversaries it suffices to look at ideal checks.
 Before stating the lemma we define the $Q$-DLOG assumption similarly to \cite{AGM}.
 \begin{dfn}\label{ref:qdlog}
- Fix integer $Q$. The \emph{$Q$-DLOG assumption for $(\G1,\G2)$} states that given 
+ Fix an integer $Q$. The \emph{$Q$-DLOG assumption for $(\G1,\G2)$} states that given
  \[\enc1{1},\enc1{x},\ldots,\enc1{x^Q},\enc2{1},\enc2{x},\ldots,\enc2{x^Q}\]
  for uniformly chosen $x\in \F$, the probability of an efficient \adv outputting $x$
  is \negl.
 \end{dfn}
 
 
-The following lemma is proved in \cite{plonk} based on the arguments of \cite{AGM}.
+The following lemma is proved in \cite{plonk}-based on the arguments of \cite{AGM}.
 \begin{lemma}\label{lem:AGManalysis}
 Assume the $Q$-DLOG for $(\G1,\G2)$.
  Given an algebraic adversary \adv participating in a protocol with a degree $Q$ SRS,
@@ -555,9 +555,9 @@ the probability of any algebraic adversary \adv winning the following game is \n
 \begin{enumerate}
  \item \adv chooses input \inp and plays the role of \prv in \prot with input \inp.
  \item \ext given access to all of \adv's messages during the protocol (including the coefficients of the linear combinations) outputs \wit.
- \item \adv wins if 
+ \item \adv wins if
  \begin{enumerate}
-  \item \ver outputs \acc at the end of the protocol, and 
+  \item \ver outputs \acc at the end of the protocol, and
   \item $(\inp,\wit)\notin \rel$.
  \end{enumerate}
 
@@ -568,19 +568,19 @@ We define polynomial commitment schemes similarly to \cite{plonk}.
 Specifically, we define the \open procedure in a batched setting having multiple polynomials and evaluation points.
 
 \begin{dfn}\label{dfn:PCscheme}
-A $d$-polynomial commitment scheme is a triplet $\PCscheme = (\gen,\com,\open)$ such that 
+A $d$-polynomial commitment scheme is a triplet $\PCscheme = (\gen,\com,\open)$ such that
 \begin{itemize}
  \item $\gen(d)$ -  is a randomized algorithm that given positive integer $d$ outputs a structured reference string (SRS) \srs0.
  \item $\com(f,\srs0)$ - is an algorithm that given a polynomial $f\in \polysofdeg{d}$ and an output \srs0 of $\gen(d)$  returns a commitment \cm to $f$.
  \item \open is a public coin protocol between parties \prvpc and \verpc. \prvpc is given $ f_1,\ldots,f_k \in \polysofdeg{d}$. \prvpc and \verpc are both given
- 
+
  \begin{enumerate}
   \item  positive integers $d,t=\poly$,
   \item  $\srs0=\gen(d)$,
   \item a subset $T=\set{z_1,\ldots,z_t}\subset \F$,
   \item subsets $S_1,\ldots,S_k \subset T$,
   \item $\cm_1,\ldots,\cm_k$ - the alleged commitments to $f_1,\ldots,f_k$,
-  \item \sett{s_{i,z}}{i\in [k],z\in S_i} - the alleged correct openings \sett{f_i(z)}{i\in [k], z\in S_i}.  
+  \item \sett{s_{i,z}}{i\in [k],z\in S_i} - the alleged correct openings \sett{f_i(z)}{i\in [k], z\in S_i}.
  \end{enumerate}
  At the end of the protocol \verpc outputs \acc or \rej;
 such that
@@ -593,8 +593,8 @@ such that
   \item \adv outputs $T=\set{z_1,\ldots,z_t}\subset \F$, $S_1,\ldots,S_k \subset T$,   \F$, \sett{s_{i,z}}{i\in [k],z\in S_i}$.
   \item \adv takes the part of \prvpc in the protocol \open with the inputs
   $\cm_1,\ldots,\cm_k$,$T, S_1,\ldots,S_k,$  $\set{s_{i,z}}$.
-  \item $\adv$ wins if 
-  \begin{itemize} 
+  \item $\adv$ wins if
+  \begin{itemize}
    \item \verpc outputs \acc at the end of the protocol.
    \item For some $i\in [k]$ and  $z\in S_i$, $s_{i,z}\neq f_i(z)$.
   \end{itemize}
@@ -614,24 +614,24 @@ such that
 We first state the following straightforward claim that allows us to efficiently ``uniformize'' checks on different evaluation points.
 \begin{claim}\label{clm:div}
  Fix subsets $S\subset T\subset \F$, and polynomials $f,r \in \polysofdeg{d}$.
- Then $f(z)=r(z)$ for each $z\in S$ if and only if 
+ Then $f(z)=r(z)$ for each $z\in S$ if and only if
  $Z_T$ divides $Z_{T\setminus S}\cdot (f(X)-r(X))$.
- 
+
 \end{claim}
 
 
 
 \begin{proof}
- $Z_T$ divides $Z_{T\setminus S}\cdot (f(X)-r(X))$ if and only if 
+ $Z_T$ divides $Z_{T\setminus S}\cdot (f(X)-r(X))$ if and only if
  $Z_{T\setminus S}\cdot (f(X)-r(X))$ vanishes on $T$ if and only if
  $(f(X)-r(X))$ vanishes on $S$.
 \end{proof}
 
 We also use the following claim, which is part of Claim 4.6 in \cite{plonk} where a proof of it can be found.
 \begin{claim}\label{clm:div_sum}
- Fix $F_1,\ldots,F_k \in \polysofdeg{n}$. Fix $Z\in \polysofdeg{n}$ that decomposes to distinct linear factors over \F. 
+ Fix $F_1,\ldots,F_k \in \polysofdeg{n}$. Fix $Z\in \polysofdeg{n}$ that decomposes to distinct linear factors over \F.
  Suppose that for some $i\in [k]$, $Z\nmid F_i$.
- Then, e.w.p $k/|\F|$ over uniform $a\in \F$, $Z$ doesn't divide
+ Then, e.w.p $k/|\F|$ over uniform $a\in \F$, $Z$ does not divide
  \[G\defeq \sum_{j=1}^k a^{j-1} \cdot F_j.\]
 
 \end{claim}
@@ -643,18 +643,18 @@ We are ready to describe our PCS.
 \begin{enumerate}
  \item $\gen(d)$ - choose uniform $x\in \F$. Output $\srs0 =(\enc1{1},\enc1{x},\ldots,\enc1{x^{d-1}},\enc2{1},\enc2{x},\ldots,\enc2{x^t})$.
  \item $\com(f,\srs0) \defeq \enc1{f(x)}$.
- \item  
+ \item
  \noindent
  $\open\left(d,t,\sett{\cm_i}{i\in [k]},T=\set{z_1,\ldots,z_t}\subset \F,\sett{S_i\subset T}{i\in [k]},\sett{s_{i,z}}{i\in [k],z\in S_i}\right)$:
  \begin{enumerate}
-  \item \verpc sends random $\gamma\in \F$.
+  \item \verpc sends a random $\gamma\in \F$.
   \item For $i\in [k]$, \verpc and \prvpc both compute the polynomials \sett{r_i}{i\in [k]}
-  such that $r_i\in \polysofdeg{|S_i|}$ satisfies $r_i(z) = s_{i,z}$ for each $z\in S_i$. 
+  such that $r_i\in \polysofdeg{|S_i|}$ satisfies $r_i(z) = s_{i,z}$ for each $z\in S_i$.
  \item \prvpc computes the polynomial
- \[h(X)\defeq \sum_{i=1}^t \gamma^{i-1}\cdot \frac{f_i(X)-r_i(X)}{Z_{S_i(X)}}  \]
+ \[h(X)\defeq \sum_{i\in [k]} \gamma^{i-1}\cdot \frac{f_i(X)-r_i(X)}{Z_{S_i(X)}}  \]
  and using \srs0 computes and sends $W\defeq \enc1{h(x)}$.
 % \[]
- \item\label{step:computeW} \verpc computes for each $i\in [k]$, $Z_i \defeq \enc2{Z_{T\setminus S_i}(x)}$. 
+ \item\label{step:computeW} \verpc computes for each $i\in [k]$, $Z_i \defeq \enc2{Z_{T\setminus S_i}(x)}$.
  \item \verpc computes
  \[F\defeq \sum_{i\in [k]} \gamma^{i-1} \cdot e(\cm_i-\enc1{r_i(x)}, Z_i).\]
  \item \verpc outputs \acc if and only if
@@ -663,10 +663,10 @@ We are ready to describe our PCS.
 
  We argue knowledge soundness for the above protocol. More precisely, we argue the existence of an efficient \ext such that an algebraic adversary \adv can only win the KS game w.p. \negl.
  %when restricting itself to choosing $z=z_1=\ldots=z_t$.
- 
- 
+
+
  Let \adv be such an algebraic adversary.
- 
+
  \adv begins by outputting $\cm_1,\ldots,\cm_k\in \G1$.
  Each $\cm_i$ is a linear combination $\sum_{j=0}^{d-1} a_{i,j} \enc1{x^j}$.
  \ext, who is given the coefficients \set{a_{i,j}}, simply outputs the polynomials
@@ -674,111 +674,87 @@ We are ready to describe our PCS.
  \adv now outputs $T=\set{z_1,\ldots,z_t}\subset \F,\sett{S_i\subset T}{i\in [k]},\sett{s_{i,z}}{i\in [k],z\in S_i}$.
  Define, for each $i\in [k]$, $r_i\in \polysofdeg{|S_i|}$ such that $r_i(z)= s_{i,z}$ for each $z\in S_i$.
   Assume that for some $i^*\in [k],z^*\in S_{i^*}$, we have $f_{i^*}(z^*)\neq r_{i^*}(z^*)$. We show that for any strategy of \adv from this point, \verpoly outputs \acc w.p. \negl.
- 
+
  In the first step of \open, \verpoly chooses a random $\gamma \in \F$.
  Let
  \[f(X)\defeq \sum_{i\in [t]} \gamma^{i-1} \cdot Z_{T\setminus S_i}\cdot (f_i(X)-r_i(X)).\]
- We know from Claim \ref{clm:div} that $F_{i^*} \defeq  Z_{T\setminus S_{i^*}}\cdot (f_{i^*}(X)-r_{i^*}(X))$ isn't divisible by $Z_T$. Thus, using Claim \ref{clm:div_sum}, we know that e.w.p $k/|\F|$ over $\gamma$, $f$ isn't divisble by $Z_T$.
+ We know from Claim \ref{clm:div} that $F_{i^*} \defeq  Z_{T\setminus S_{i^*}}\cdot (f_{i^*}(X)-r_{i^*}(X))$ is not divisible by $Z_T$. Thus, using Claim \ref{clm:div_sum}, we know that e.w.p $k/|\F|$ over $\gamma$, $f$ is not divisble by $Z_T$.
   Now \adv outputs $W=\enc1{H(x)}$ for some $H\in\polysofdeg{d}$.
  According to Lemma \ref{lem:AGManalysis}, it suffices to upper bound the probability that the ideal check corresponding to the real pairing check in the protocol passes. It has the form
  \[f(X) \equiv H(X)Z_T(X).\]
  The check passing implies that
  $f(X)$ is divisible by $Z_T$. Thus the ideal check can only pass w.p. $k/|\F|= \negl$ over the randomness of \verpoly, which implies the same thing for the real check according to Lemma \ref{lem:AGManalysis}.
- 
- 
+
+
  \end{enumerate}
 
- 
- 
+
+
  We summarize the efficiency properties of the scheme.
- 
+
  \begin{lemma}\label{lem:multikate}
- Fix positive integer $d$.
-  There is a $d$-polynomial commitment scheme \PCscheme such that
+ Fix a positive integer $d$.
+  There is a $d$-PCD \PCscheme such that
   \begin{enumerate}
    \item For $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f)$ requires $n$ \G1-exponentiations.
-   \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$, denote by $k^*$ the number of distinct subsets  \set{S^*_1,\ldots,S^*_{k^*}} in \set{S_i}; and 
+   \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$, denote by $k^*$ the number of distinct subsets  \set{S^*_1,\ldots,S^*_{k^*}} in \set{S_i}; and
    let $K\defeq t+ \sumi {k^*}\left( t-|S^*_i|\right)$.
    and denote $d^* \defeq \max\sett{\deg(f_i)}{i\in [k]}$.
    Let $\cm_i = \com(f_i)$.
-   Then \open(\set{cm_i},\set{f_i},T,\set{S_i\subset T},\set{s_{i,z}})  requires
+   Then \open(\set{\cm_i},\set{f_i},T,\set{S_i\subset T},\set{s_{i,z}}) requires
    \begin{enumerate}
-   \item A single \G1 element to be passed from \prvpoly to \verpoly.
+    \item A single \G1 element to be passed from \prvpoly to \verpoly.
     \item At most $d^*$ \G1-exponentiations of \prvpoly.
-    \item $k-1$ \G1-exponentiations, $K$ \G2-exponentiations  and $k^*+1$ pairings of \verpoly.
-    \end{enumerate}
+    \item $k-1$ \G1-exponentiations, $K$ \G2-exponentiations and $k^*+1$ pairings of \verpoly.
+   \end{enumerate}
 \end{enumerate}
 
- \end{lemma}
+\end{lemma}
 
+\newpage
 \section{Reducing verifier operations at the expense of proof length}
+
 We describe a variant of the scheme of Section \ref{sec:main} where we eliminate the verifier's \G2 operations and reduce the number of pairings to two. This comes at the cost of an extra \G1 element sent by the prover. We state the result first, followed by the description of the scheme.
 
 \begin{lemma}\label{lem:multikateG1}
- Fix positive integer $d$.
-  There is a $d$-polynomial commitment scheme \PCscheme such that
-  \begin{enumerate}
-   \item For $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f)$ requires $n$ \G1-exponentiations.
-   \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$, ; and 
-   let $K\defeq t+ 1 + \sumi {k}\left( |S_i|\right)$.
-   and denote $d^* \defeq \max\sett{\deg(f_i)}{i\in [k]}$.
-   Let $\cm_i = \com(f_i)$.
-   Then \open(\set{cm_i},\set{f_i},T,\set{S_i\subset T},\set{s_{i,z}})  requires
-   \begin{enumerate}
-   \item Two  \G1 elements to be passed from \prvpc to \verpc.
-    \item At most $2d^*+1$ \G1-exponentiations of \prvpc.
-    \item $K$ \G1-exponentiations,  and two pairings of \verpc.
+Let $n,d$ be positive integers with $n\le d$, $f_i\in\polysofdeg{n}$ for $i\in[k]$, $S_i$ the opening set for $f_i$, $r_i\in\polysofdeg{|S_i|}$ such that $r_i|_{S_i} = f_i|_{S_i}$, $T= S_1\cup\ldots\cup S_k$, and $t=|T|$. Then there is a multi-point multi-polynomial commitment scheme \PCscheme such that:
+\begin{enumerate}
+\item the commitment $\com(f_i)$ to $f_i$ requires $\deg(f_i)$ \G1-exponentiations
+\item the opening $\open\left(d,\set{\com(f_i)},\set{S_i},\set{r_i}\right)$ requires
+    \begin{enumerate}
+    \item 2 \G1 elements sent from \prvpc to \verpc
+    \item at most $2n+1$ \G1-exponentiations of \prvpc
+    \item $k+3$ \G1-exponentiations and 2 pairings of \verpc
+    \end{enumerate}
+\end{enumerate}
+\end{lemma}
+
+The PCS is as follows:
+\begin{enumerate}
+\item $\gen(d)$ outputs $\srs0 =(\enc1{1},\enc1{x},\ldots,\enc1{x^{d-1}},\enc2{1},\enc2{x})$ for a random $x\in \F$
+\item $\com(f_i)=\enc1{f_i(x)}$
+\item $\open\left(d,\set{\com(f_i)},\set{S_i},\set{r_i}\right)$ is a 2-round protocol where:
+    \begin{enumerate}
+    \item \verpc sends a random challenge $\gamma\in \F$
+    \item \prvpc sends $W=\enc1{(f/Z_T)(x)}$ where
+    \[f(X)=\sum_{i\in [k]} \gamma^{i-1} Z_{T\setminus S_i}(X)(f_i(X)-r_i(X))\]
+    \item \verpc sends a random evaluation point $z\in \F$
+    \item \prvpc sends $W'=\enc1{f'(x)/(x-z)}$ where
+    \[f'(X)=\sum_{i\in [k]} \gamma^{i-1} Z_{T\setminus S_i}(z)(f_i(X)-r_i(z)) - Z_T(z)(f/Z_T)(X)\]
+    \item \verpc checks $e(F-zW',\enc2{1}) = e(W',\enc2{x})$ where
+    \[F=\sum_{i\in [k]} \gamma^{i-1} Z_{T\setminus S_i}(z)\com(f_i) - \enc1{\sum_{i\in [k]} \gamma^{i-1} Z_{T\setminus S_i}(z)r_i(z)} - Z_T(z)W\]
     \end{enumerate}
 \end{enumerate}
 
- \end{lemma}
+Notice that $W$ and $W'$ are well-defined since $f$ is divisible by $Z_T$ by Claim \ref{clm:div_sum} and $f'$ is divisible by $X-z$ since $f'(z)=f(z)-Z_T(z)(f/Z_T)(z)=0$.
 
-
- We present the PCS.
- 
-\begin{enumerate}
- \item $\gen(d)$ - choose uniform $x\in \F$. Output $\srs0 =(\enc1{1},\enc1{x},\ldots,\enc1{x^{d-1}},\enc2{1},\enc2{x})$.
- \item $\com(f,\srs0) \defeq \enc1{f(x)}$.
- \item  
- \noindent
- $\open\left(d,t,\sett{\cm_i}{i\in [k]},T=\set{z_1,\ldots,z_t}\subset \F,\sett{S_i\subset T}{i\in [k]},\sett{s_{i,z}}{i\in [k],z\in S_i}\right)$:
- \begin{enumerate}
-  \item \verpc sends random $\gamma\in \F$.
-  \item For $i\in [k]$, \verpc and \prvpc both compute the polynomials \sett{r_i}{i\in [k]}
-  such that $r_i\in \polysofdeg{|S_i|}$ satisfies $r_i(z) = s_{i,z}$ for each $z\in S_i$. 
- \item \prvpc computes the polynomial
- \[f(X)\defeq \sum_{i=1}^t \gamma^{i-1}\cdot Z_{T\setminus S_i}(X)\cdot (f_i(X)-r_i(X)).\]
- Recall that $f$ is divisible by $Z_T$ according to Claim \ref{clm:div_sum}, and define
- $h(X)\defeq f(X)/Z_T(X)$.
- Using \srs0, \prvpc computes and sends $W\defeq \enc1{h(x)}$.
-% \[]
- \item \verpc sends random $z\in \F$.
-%  \item Let $S'_1,\ldots S'_{k^*}$ be the distinct subsets among $S_1,\ldots,S_k$. ``Split'' $g$ according to these distinct subsets; i.e. for $i\in [k^*]$
-%  \[g_i(X) \defeq \sum_{j\in [k], S_j=S'_i}^t \gamma^{j-1}\cdot Z_{T\setminus S_j}(X)\cdot (f_j(X)-r_j(X)).  \]
-%  Note that $g(X)=\sum_{i\in [k^*]} g_i(X)$.
-%  
-%  \prvpc sends the values $t_i \defeq g_i(z)$ for $i\in [k^*]$.
-
-\item \prvpc computes the polynomial
-\[L(X)\defeq f_z(X) - Z_T(z)\cdot h(X),\]
-where 
-\[f_z(X)\defeq \sum_{i=1}^t \gamma^{i-1}\cdot Z_{T\setminus S_i}(z)\cdot (f_i(X)-r_i(X))\]
-Note that $L(z)= f(z)- Z_T(z)\cdot h(z) =0$, and thus $(X-z)$ divides $L$.
-\prvpc sends $W'\defeq \enc1{\frac{L(x)}{x-z}}$.
-
-\item \verpc computes:
-\[F\defeq \sum_{i\in [t]} \gamma^{i-1} \cdot Z_{T\setminus S_i}(z)\cdot (\com(f_i) - \enc1{r_i(X)}) - Z_T(z)\cdot W \]
- \item \verpc outputs \acc if and only if
- \[ e(F,\enc2{1}) = e(W',\enc2{x-z}).\]
-
-\end{enumerate}
-
- We argue knowledge soundness for the above protocol.More precisely, we argue the existence of an efficient \ext such that an algebraic adversary \adv can only win the KS game w.p. \negl.  The proof begins identically to the previous one. 
+\newpage
+We argue knowledge soundness for the above protocol. More precisely, we argue the existence of an efficient \ext such that an algebraic adversary \adv can only win the KS game w.p. \negl.  The proof begins identically to the previous one.
  %when restricting itself to choosing $z=z_1=\ldots=z_t$.
- 
- 
+
+
  Let \adv be such an algebraic adversary.
- 
+
  \adv begins by outputting $\cm_1,\ldots,\cm_k\in \G1$.
  Each $\cm_i$ is a linear combination $\sum_{j=0}^{d-1} a_{i,j} \enc1{x^j}$.
  \ext, who is given the coefficients \set{a_{i,j}}, simply outputs the polynomials
@@ -786,16 +762,16 @@ Note that $L(z)= f(z)- Z_T(z)\cdot h(z) =0$, and thus $(X-z)$ divides $L$.
  \adv now outputs $T=\set{z_1,\ldots,z_t}\subset \F,\sett{S_i\subset T}{i\in [k]},\sett{s_{i,z}}{i\in [k],z\in S_i}$.
  Define, for each $i\in [k]$, $r_i\in \polysofdeg{|S_i|}$ such that $r_i(z)= s_{i,z}$ for each $z\in S_i$.
   Assume that for some $i^*\in [k],z^*\in S_{i^*}$, we have $f_{i^*}(z^*)\neq r_{i^*}(z^*)$. We show that for any strategy of \adv from this point, \verpoly outputs \acc w.p. \negl.
- 
+
  In the first step of \open, \verpoly chooses a random $\gamma \in \F$.
  Let
  \[f(X)\defeq \sum_{i\in [t]} \gamma^{i-1} \cdot Z_{T\setminus S_i}\cdot (f_i(X)-r_i(X)).\]
- We know from Claim \ref{clm:div} that $F_{i^*} \defeq  Z_{T\setminus S_{i^*}}\cdot (f_{i^*}(X)-r_{i^*}(X))$ isn't divisible by $Z_T$. Thus, using Claim \ref{clm:div_sum}, we know that e.w.p $k/|\F|$ over $\gamma$, $f$ isn't divisble by $Z_T$. Assume we are in this case.  Now \adv outputs $W=\enc1{H(x)}$ for some $H\in\polysofdeg{d}$, followed
+ We know from Claim \ref{clm:div} that $F_{i^*} \defeq  Z_{T\setminus S_{i^*}}\cdot (f_{i^*}(X)-r_{i^*}(X))$ is not divisible by $Z_T$. Thus, using Claim \ref{clm:div_sum}, we know that e.w.p $k/|\F|$ over $\gamma$, $f$ is not divisble by $Z_T$. Assume we are in this case.  Now \adv outputs $W=\enc1{H(x)}$ for some $H\in\polysofdeg{d}$, followed
  by \verpc sending uniform $z\in \F$.
- Since we are in the case that $f$ isn't divisble by $Z_T$, we know there are at most
+ Since we are in the case that $f$ is not divisble by $Z_T$, we know there are at most
  $2d$ values $z\in \F$ such that $f(z) = H(z)\cdot Z_T(z)$; and thus $z$ chosen by \verpc is of this form only w.p. \negl. Assume $z$ sent by \verpc is not of this form.
   \prvpc now outputs $W'=\enc1{H'(x)}$ for some $H'\in \polysofdeg{d}$
- According to Lemma \ref{lem:AGManalysis}, it suffices to upper bound the probability that the ideal check corresponding to the real pairing check in the protocol passes. 
+ According to Lemma \ref{lem:AGManalysis}, it suffices to upper bound the probability that the ideal check corresponding to the real pairing check in the protocol passes.
  Denoting
  \[L'(X)\defeq \sum_{i\in [t]} Z_{T\setminus S_i}(z)\cdot (f_i(X) - r_i(X)) - Z_T(z)\cdot H(X),\]
  the ideal check has the form
@@ -807,18 +783,14 @@ Note that $L(z)= f(z)- Z_T(z)\cdot h(z) =0$, and thus $(X-z)$ divides $L$.
  \]
 and we are in the case where $f(z)\neq Z_T(z)\cdot H(z)$.
  In summary, the ideal check can only pass w.p. $\negl$ over the randomness of \verpc, which implies the same thing for the real check according to Lemma \ref{lem:AGManalysis}.
- 
- 
- \end{enumerate}
 
- 
 
 
 \section*{Acknowledgements}
 Part of this research was conducted while the second author was supported by Protocol Labs.
 \bibliographystyle{alpha}
 \bibliography{references}
-    
+
 \end{document}
 
 
