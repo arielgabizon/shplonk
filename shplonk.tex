@@ -720,7 +720,7 @@ We describe a variant of the scheme of Section \ref{sec:main} where we eliminate
 Let $n,d$ be positive integers with $n\le d$, $f_i\in\polysofdeg{n}$ for $i\in[k]$, $S_i$ the opening set for $f_i$, $r_i\in\polysofdeg{|S_i|}$ such that $r_i|_{S_i} = f_i|_{S_i}$, $T= S_1\cup\ldots\cup S_k$, and $t=|T|$. Then there is a multi-point multi-polynomial commitment scheme \PCscheme such that:
 \begin{enumerate}
 \item the commitment $\com(f_i)$ to $f_i$ requires $\deg(f_i)$ \G1-exponentiations
-\item the opening $\open\left(d,\set{\com(f_i)},\set{S_i},\set{r_i}\right)$ requires
+\item the opening $\open(d,\set{\com(f_i)},\set{S_i},\set{r_i})$ requires
     \begin{enumerate}
     \item 2 \G1 elements sent from \prvpc to \verpc
     \item at most $2n+1$ \G1-exponentiations of \prvpc
@@ -729,11 +729,12 @@ Let $n,d$ be positive integers with $n\le d$, $f_i\in\polysofdeg{n}$ for $i\in[k
 \end{enumerate}
 \end{lemma}
 
-The PCS is as follows:
+\noindent The PCS is described below.
+
 \begin{enumerate}
 \item $\gen(d)$ outputs $\srs0 =(\enc1{1},\enc1{x},\ldots,\enc1{x^{d-1}},\enc2{1},\enc2{x})$ for a random $x\in \F$
 \item $\com(f_i)=\enc1{f_i(x)}$
-\item $\open\left(d,\set{\com(f_i)},\set{S_i},\set{r_i}\right)$ is a 2-round protocol where:
+\item $\open(d,\set{\com(f_i)},\set{S_i},\set{r_i})$ is a 2-round protocol where
     \begin{enumerate}
     \item \verpc sends a random challenge $\gamma\in \F$
     \item \prvpc sends $W=\enc1{(f/Z_T)(x)}$ where
@@ -746,7 +747,7 @@ The PCS is as follows:
     \end{enumerate}
 \end{enumerate}
 
-Notice that $W$ and $W'$ are well-defined since $f$ is divisible by $Z_T$ by Claim \ref{clm:div_sum} and $f'$ is divisible by $X-z$ since $f'(z)=f(z)-Z_T(z)(f/Z_T)(z)=0$.
+\noindent Notice that $W$ and $W'$ are well-defined since $f$ is divisible by $Z_T$ by Claim \ref{clm:div_sum} and $f'$ is divisible by $X-z$ since $f'(z)=f(z)-Z_T(z)(f/Z_T)(z)=0$.
 
 \newpage
 We argue knowledge soundness for the above protocol. More precisely, we argue the existence of an efficient \ext such that an algebraic adversary \adv can only win the KS game w.p. \negl.  The proof begins identically to the previous one.
