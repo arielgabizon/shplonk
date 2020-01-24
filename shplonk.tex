@@ -397,13 +397,13 @@ As a sample application we ``plug in'' this scheme into the \plonk proving syste
 
 Polynomial commitment schemes (PCS) are an important primitive in arguably all\footnote{While QAP based proving systems like \cite{pinocchio,groth16} are not traditionally formulated as using a PCS, they can be interpreted as using a PCS that also forces the committed polynomial to be in a certain subspace. This is related to the linear interactive proof framework of  \cite{bciop}.} practical succinct proving systems (see \cite{marlin,plonk,supersonic} for formalizations of their role).  They can ``force'' a prover to answer verifier queries according to a fixed polynomial of bounded degree.
 
-The more straightforward version of this primitive contains an initial prover message $\com(f)$ corresponding to the commitment to a polynomial $f$. Then, whenever the prover sends a value $s\in \F$ which is allegedly the value $f(z)$ for $z$ known to the verifier, the prover will send a corresponding opening proof $\pi$ that this is indeed the case. In a protocol where this primitive is used for several polynomials and several evaluation points, prover run time and proof length will increase with each of these opening proofs.
+The use of a PCS typically starts by an initial prover message $\com(f)$ corresponding to the commitment to a polynomial $f$. Then, in the more straightforward use of this primitive, whenever the prover sends a value $s\in \F$ which is allegedly the value $f(z)$ for $z$ known to the verifier, the prover will send a corresponding ``opening proof'' $\pi$ that this is indeed the case. When a PCS is used in this way for several polynomials and several evaluation points, prover run time and proof length will increase with each of these opening proofs.
 
 
 
 \subsection{Previous work and our results}
 
-We take the PCS of Kate, Zaverucha and Goldberg \cite{kate} as our starting point. Their scheme is pairing based and an opening proof $\pi$ consists of a single $\G1$ group element. We ask whether we can get a variant of this scheme where a single opening proof (in the sense of one \G1 element) can prove correctness of multiple polynomial evaluations.
+We take the PCS of Kate, Zaverucha and Goldberg \cite{kate} as our starting point. Their scheme is pairing based and an opening proof $\pi$ consists of a single $\G1$ group element. We ask whether we can get a variant of this scheme where a single $\G1$ element can prove correctness of multiple polynomial evaluations.
 
 Several works \cite{sonic,auroralight,marlin,plonk} (starting from \cite{sonic}) have noticed that it possible to modify the PCS of \cite{kate} in the random oracle model to allow for one opening proof for several polynomials \emph{at the same point $z\in \F$} .
 \cite{kate} give in their paper a less known version of their scheme allowing for one opening proof for one polynomial at several evaluation points.
@@ -413,10 +413,10 @@ Several works \cite{sonic,auroralight,marlin,plonk} (starting from \cite{sonic})
 In this paper, we give two PCS schemes for multiple evaluation points and polynomials.
 \begin{itemize}
  \item In our first scheme the opening proof is only a single \G1 element, but verifier operations are considerably heavier than previous variants of \cite{kate} when the number of distinct evaluation points is large (cf. Lemma \ref{lem:multikate}).
-\item In our second scheme th opening proof is two \G1 elements, and the verifier complexity is slightly better than previous multipoint variants of \cite{kate} (cf. Lemma \ref{lem:multikateG1}).
+\item In our second scheme the opening proof is two \G1 elements, and the verifier complexity is slightly better than previous multipoint variants of \cite{kate} (cf. Lemma \ref{lem:multikateG1}).
  \end{itemize}
 
-We compare the performance of our PCS compared to a more straightforward batched version of the \cite{kate} scheme as in \cite{plonk}.
+We compare the performance of our PCSs to a more straightforward batched version of the \cite{kate} scheme as in \cite{plonk}.
 For simplicity, we look at the restricted case where we want to open $t$ polynomials all with the same degree bound $n$, each at one \emph{distinct} point. See Lemma \ref{lem:multikate} for the more detailed efficiency properties in the general case (where each polynomial is opened at a subset of points, and the subsets may repeat).
 \begin{table}[!htbp]
 	\caption{Comparison of opening complexity for $t$ polynomials on $t$ distinct points. In prover/verifier work columns \Gi means scalar multiplication in \Gi, \F means addition or multiplication in \F, and \textbf{P} means pairing. }
@@ -440,9 +440,9 @@ For simplicity, we look at the restricted case where we want to open $t$ polynom
 
 
 The \plonk proving system \cite{plonk}  allows generating proofs of knowledge for assignments
-to fan-in two arithmetic circuits with a universal and updatable SRS (see the paragraph on this topic in Section \ref{sec:terminology}). Most of the prover computation involves committing to several polynomials and opening them at two distinct evaluation points. Plugging in our PCS to \plonk allows saving in proof length and prover work related to the opening proof of the second evaluation point (we do not give full details, but all that is needed is repreating the transformation of Lemma 4.7 in \cite{plonk} using the PCS of Lemma \ref{lem:multikate} here instead of the PCS used there to obtain the new result).
+to fan-in two arithmetic circuits with a universal and updatable SRS (see the paragraph on this topic in Section \ref{sec:terminology}). Most of the prover computation involves committing to several polynomials and opening them at two distinct evaluation points. Plugging in our PCS to \plonk allows saving in proof length and prover work related to the opening proof of the second evaluation point (we do not give full details, but all that is needed is repreating the transformation of Lemma 4.7 in \cite{plonk} using the PCS of Lemma \ref{lem:multikate} instead of the PCS used there to obtain the new result).
 
-We compare the \plonk scheme when using the  \cite{kate}-based PCS in \cite{plonk} and the first PCS of this paper in Table \ref{table:plonk}. As in \cite{plonk} we present look at two versions of \plonk where one optimizes fast proving, and the other small proof length.
+We compare the \plonk scheme when using the  \cite{kate}-based PCS in \cite{plonk} and the first PCS of this paper in Table \ref{table:plonk}. As in \cite{plonk} we present two versions of \plonk where one optimizes fast proving, and the other small proof length.
 
 \begin{table}[!htbp]
 	\caption{Comparison of \plonk efficiency for fan-in two circuit with $n$  gates.}
@@ -451,8 +451,8 @@ We compare the \plonk scheme when using the  \cite{kate}-based PCS in \cite{plon
 	\begin{tabular}{l|l|l|l|l}
 	 & \thead{SRS size} & \thead{prover \\ group exponentations} & \thead{proof\\ length} & verifier work \\ \hline
 		\cite{plonk} (fast) &  $n$ \G1, $2$ \G2  & $9n$ \G1 exp   & $9$ \G1, $7$ \F  &   $18$ \G1, $2$ \textbf{P} \\ \hline
-		\cite{plonk} (small) &  $3n$ \G1, $2$ \G2  & $11n$ \G1 exp   & $7$ \G1, $7$ \F  &   $16$ \G1, $2$ \textbf{P} \\ \hline
 		This work (fast)    &$n$ \G1, $3$ \G2 &  $8n$ \G1 exp    & $8$ \G1 $7$ \F &   $18$ \G1, $4$ \G2, $3$ \textbf{P} \\ \hline
+		\cite{plonk} (small) &  $3n$ \G1, $2$ \G2  & $11n$ \G1 exp   & $7$ \G1, $7$ \F  &   $16$ \G1, $2$ \textbf{P} \\ \hline
 		This work (small)    &$3n$ \G1, $3$ \G2 &  $10n$ \G1 exp    & $6$ \G1 $7$ \F &   $16$ \G1, $4$ \G2, $3$ \textbf{P} \\ \hline
 
 		\end{tabular}
@@ -461,7 +461,7 @@ We compare the \plonk scheme when using the  \cite{kate}-based PCS in \cite{plon
 \end{table} 
 
 \paragraph{\shplonk?}
-Our second PCS does not give interesting tradeoffs for \plonk as two evaluation points are not enough for its advantages to ``kick in''. However, in a scenario where constraints between \emph{more than two} evaluation points are used, e.g. \cite{slonk}, the advantages of both our new schemes will become more prominent. Thus, the PCSs of this paper encourage designing constraint systems using multiple Shifts and Permuations over Largange bases for Oecumenical arguments of Knowledge.
+Our second PCS does not give interesting tradeoffs for \plonk as two evaluation points are not enough for its advantages to ``kick in''. However, in a scenario where constraints between \emph{more than two} evaluation points are used, e.g. \cite{slonk}, the advantages of both of our new schemes will become more prominent. Thus, the PCSs of this paper encourage designing constraint systems using multiple SHifts and Permutations over Largange bases for Oecumenical Noninteractive arguments of Knowledge.
 \section{Preliminaries}
 
 
@@ -586,7 +586,7 @@ A $d$-polynomial commitment scheme is a triplet $\PCscheme = (\gen,\com,\open)$ 
 such that
 \begin{itemize}
  \item \textbf{Completeness:} Fix any $k,t=\poly$, $T=\set{z_1,\ldots,z_t}\subset \F$, $S_1,\ldots,S_k \subset T$, $f_1,\ldots,f_k\in \polysofdeg{d}$. Suppose that for each $i\in [k]$, $\cm_i = \com(f_i,\srs0)$, and for each $i\in [k]$ and $z \in S_i$ we have  $s_{i,z} = f_i(z)$.  Then if \prvpc follows \open correctly with these values, \verpc outputs \acc with probability one.
- \item \textbf{Knowledge soundness in the algebraic group model:} There exists an efficient \ext such that for any algebraic adversary \adv and any choice of $d=\poly$ the probability of \adv winning the following game is \negl over the randomness of \adv and \gen.
+ \item \textbf{Knowledge soundness in the algebraic group model:} There exists an efficient \ext such that for any algebraic adversary \adv and any choice of $d=\poly$ the probability of \adv winning the following game is \negl over the randomness of \adv, \verpc and \gen.
  \begin{enumerate}
   \item Given $d$ and $\srs0=\gen(d)$, \adv outputs $\cm_1,\ldots,\cm_k\in \G1$.
   \item \ext, given access to the messages of \adv during the previous step, outputs $f_1,\ldots,f_k \in \polysofdeg{d}$.
@@ -632,7 +632,7 @@ We also use the following claim, which is part of Claim 4.6 in \cite{plonk} wher
  Fix $F_1,\ldots,F_k \in \polysofdeg{n}$. Fix $Z\in \polysofdeg{n}$ that decomposes to distinct linear factors over \F. 
  Suppose that for some $i\in [k]$, $Z\nmid F_i$.
  Then, e.w.p $k/|\F|$ over uniform $a\in \F$, $Z$ doesn't divide
- \[G\defeq \sum_{j=1}^k a^j \cdot F_j.\]
+ \[G\defeq \sum_{j=1}^k a^{j-1} \cdot F_j.\]
 
 \end{claim}
 
