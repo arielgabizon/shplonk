@@ -700,7 +700,7 @@ We also use the following claim, which is part of Claim 4.6 in \cite{plonk} wher
  \begin{lemma}\label{lem:multikate}
   There is a PCS $\PCscheme=(\gen,\com,\open)$ such that
   \begin{enumerate}
-\item For positive integer $d$ $\srs0=\gen(d)$ consists of $d+1$ \G1 elements and $t+1$ \G2 elements.
+\item For positive integer $d$, $\srs0=\gen(d)$ consists of $d$ \G1 elements and $t+1$ \G2 elements.
   \item For integer $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f,\srs0)$ when $\srs0=\gen(d)$ requires $n$ \G1-exponentiations.
    \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$, denote by $k^*$ the number of distinct subsets  \set{S^*_1,\ldots,S^*_{k^*}} in \set{S_i}; and
    let $K\defeq t+ \sumi {k^*}\left( t-|S^*_i|\right)$.
@@ -720,69 +720,39 @@ We also use the following claim, which is part of Claim 4.6 in \cite{plonk} wher
 \section{Reducing verifier operations at the expense of proof length}\label{sec:secondpcs}
 
 We describe a variant of the scheme of Section \ref{sec:main} where we eliminate the verifier's \G2 operations and reduce the number of pairings to two. This comes at the cost of an extra \G1 element sent by the prover. Roughly speaking, while in Section \ref{sec:main} \verpc used \G2 and pairing operations to compute the evaluation of a certain polynomial $f$ encoded in the target group, in this protocol \prvpc gives \verpc this evaluation encoded \G1, accompanied by a proof that it is correct (which is the second \G1 element sent by \prvpc).
-We state the result first, followed by the description of the scheme.
+We first describe the PCS, and end the section by stating the obtained final result.
 
-\begin{lemma}\label{lem:multikateG1}
-There is a PCS $\PCscheme=(\gen,\com,\open)$ such that
-  \begin{enumerate}
-\item For positive integer $d$, $\srs0=\gen(d)$ consists of $d+1$ \G1 elements and $2$ \G2 elements.
-  \item For integer $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f,\srs0)$ when $\srs0=\gen(d)$ requires $n$ \G1-exponentiations.
-   \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$   and denote $n \defeq \max\sett{\deg(f_i)}{i\in [k]}$.
-   Let $\cm_i = \com(f_i)$.
-   Then $\open\left(\set{\cm_i},\set{f_i},T,\set{S_i\subset T},\set{r_i},\srs0 \right)$ requires
-
-    \begin{enumerate}
-    \item 2 \G1 elements sent from \prvpc to \verpc.
-    \item at most $2n+1$ \G1-exponentiations of \prvpc.
-    \item $k+3$ \G1-exponentiations and 2 pairings of \verpc.
-\end{enumerate}
-\end{enumerate}
-
-
-\end{lemma}
-
-\noindent The PCS is described below.
 
 \begin{enumerate}
 \item $\gen(d)$ outputs $\srs0 =(\enc1{1},\enc1{x},\ldots,\enc1{x^{d-1}},\enc2{1},\enc2{x})$ for a random $x\in \F$
 \item $\com(f_i)=\enc1{f_i(x)}$
-\item We describe the \open procedure twice below. First, in a way that will be convenient for the security analysis, and later in an equivalent more concise way that also optimized verifier operations.
+\item We describe the \open procedure twice below. First, in a way that will be convenient for the security analysis, and later in an equivalent more concise way that also optimizes verifier operations, .e.g. moves operations from \G2 into \G1 when possible.
 \end{enumerate}
 
 \noindent
-$\open(d,\set{\com(f_i)},\set{S_i},\set{r_i})$:
+$\underline{\open(\set{\cm_i},T,\set{S_i},\set{r_i})}$:
 \begin{enumerate}
- \item \verpc sends random $\gamma\in \F$.	    \[f(X)=\sum_{i\in [k]} \gamma^{i-1} Z_{T\setminus S_i}(X)(f_i(X)-r_i(X))\]
-  \item For $i\in [k]$, \verpc and \prvpc both compute the polynomials \sett{r_i}{i\in [k]}
-  \item \verpc sends a random evaluation point $z\in \F$
-  such that $r_i\in \polysofdeg{|S_i|}$ satisfies $r_i(z) = s_{i,z}$ for each $z\in S_i$. 
-  \item \prvpc sends $W'=\enc1{f'(x)/(x-z)}$ where
- \item \prvpc computes the polynomial	    \[f'(X)=\sum_{i\in [k]} \gamma^{i-1} Z_{T\setminus S_i}(z)(f_i(X)-r_i(z)) - Z_T(z)(f/Z_T)(X)\]
- \[f(X)\defeq \sum_{i=1}^t \gamma^{i-1}\cdot Z_{T\setminus S_i}(X)\cdot (f_i(X)-r_i(X)).\]	    
- \item \verpc checks $e(F-zW',\enc2{1}) = e(W',\enc2{x})$ where
+  \item \verpc sends random $\gamma\in \F$.
+ \item \prvpc computes the polynomial
+ \[f(X)\defeq \sum_{i\in [k]} \gamma^{i-1}\cdot Z_{T\setminus S_i}(X)\cdot (f_i(X)-r_i(X)).\]
  Recall that $f$ is divisible by $Z_T$ according to Claim \ref{clm:div_sum}, and define
- \[F=\sum_{i\in [k]} \gamma^{i-1} Z_{T\setminus S_i}(z)\com(f_i) - \enc1{\sum_{i\in [k]} \gamma^{i-1} Z_{T\setminus S_i}(z)r_i(z)} - Z_T(z)W\]
- $h(X)\defeq f(X)/Z_T(X)$.	    
- Using \srs0, \prvpc computes and sends $W\defeq \enc1{h(x)}$.	
-% \[]	
- \item \verpc sends random $z\in \F$.	
-%  \item Let $S'_1,\ldots S'_{k^*}$ be the distinct subsets among $S_1,\ldots,S_k$. ``Split'' $g$ according to these distinct subsets; i.e. for $i\in [k^*]$	
-%  \[g_i(X) \defeq \sum_{j\in [k], S_j=S'_i}^t \gamma^{j-1}\cdot Z_{T\setminus S_j}(X)\cdot (f_j(X)-r_j(X)).  \]	
-%  Note that $g(X)=\sum_{i\in [k^*]} g_i(X)$.	
-%  	
-%  \prvpc sends the values $t_i \defeq g_i(z)$ for $i\in [k^*]$.	
+ $h(X)\defeq f(X)/Z_T(X)$.
+ Using \srs0, \prvpc computes and sends $W\defeq \enc1{h(x)}$.
+% \[]
+ \item \verpc sends random $z\in \F$.
 
-\item \prvpc computes the polynomial	
-\[L(X)\defeq f_z(X) - Z_T(z)\cdot h(X),\]	
-where 	
-\[f_z(X)\defeq \sum_{i=1}^t \gamma^{i-1}\cdot Z_{T\setminus S_i}(z)\cdot (f_i(X)-r_i(X))\]	
-Note that $L(z)= f(z)- Z_T(z)\cdot h(z) =0$, and thus $(X-z)$ divides $L$.	
-\prvpc sends $W'\defeq \enc1{\frac{L(x)}{x-z}}$.	
+\item \prvpc computes the polynomial
+\[L(X)\defeq f_z(X) - Z_T(z)\cdot h(X),\]
+where 
+\[f_z(X)\defeq \sum_{i\in [k]} \gamma^{i-1}\cdot Z_{T\setminus S_i}(z)\cdot (f_i(X)-r_i(z))\]
+Note that $L(z)= f(z)- Z_T(z)\cdot h(z) =0$, and thus $(X-z)$ divides $L$.
+\prvpc sends $W'\defeq \enc1{\frac{L(x)}{x-z}}$.
 
-\item \verpc computes:	
-\[F\defeq \sum_{i\in [t]} \gamma^{i-1} \cdot Z_{T\setminus S_i}(z)\cdot (\com(f_i) - \enc1{r_i(X)}) - Z_T(z)\cdot W \]	
- \item \verpc outputs \acc if and only if	
- \[ e(F,\enc2{1}) = e(W',\enc2{x-z}).\]	
+\item \verpc computes:
+\[F\defeq \sum_{i\in [k]} \gamma^{i-1} \cdot Z_{T\setminus S_i}(z)\cdot (\cm_i - \enc1{r_i(z)}) - Z_T(z)\cdot W \]
+ \item\label{stp:verchecksecond} \verpc outputs \acc if and only if
+ \[ e(F,\enc2{1}) = e(W',\enc2{x-z}).\]
+
 \end{enumerate}
 
     
@@ -790,13 +760,6 @@ Note that $L(z)= f(z)- Z_T(z)\cdot h(z) =0$, and thus $(X-z)$ divides $L$.
 
 
 %\newpage
-We begin by observing that the protocol is well-defined for the honest prover:
-$W$ in step \ref{stp:W} is well-defined since $Z_t\mid f$ by Claim \ref{clm:div_sum}. Similarly, since $f_z(z)=f(z)-Z_T(z)(f/Z_T)(z)=0$, $f'$ is divisible by $X-z$. Thus,
-$W'$ in step \ref{step:W'} is well-defined.
-
-   
-
-
 
 We argue knowledge soundness for the above protocol. More precisely, we argue the existence of an efficient \ext such that an algebraic adversary \adv can only win the KS game w.p. \negl.  The proof begins identically to the previous one.
  %when restricting itself to choosing $z=z_1=\ldots=z_t$.
@@ -813,12 +776,12 @@ We argue knowledge soundness for the above protocol. More precisely, we argue th
 
  In the first step of \open, \verpoly chooses a random $\gamma \in \F$.
  Let
- \[f(X)\defeq \sum_{i\in [t]} \gamma^{i-1} \cdot Z_{T\setminus S_i}\cdot (f_i(X)-r_i(X)).\]
+ \[f(X)\defeq \sum_{i\in [k]} \gamma^{i-1} \cdot Z_{T\setminus S_i}\cdot (f_i(X)-r_i(X)).\]
  We know from Claim \ref{clm:div} that $F_{i^*} \defeq  Z_{T\setminus S_{i^*}}\cdot (f_{i^*}-r_{i^*})$ is not divisible by $Z_T$. Thus, using Claim \ref{clm:div_sum}, we know that e.w.p $k/|\F|$ over $\gamma$, $f$ is not divisble by $Z_T$. Assume we are in this case.  Now \adv outputs $W=\enc1{H(x)}$ for some $H\in\polysofdeg{d}$, followed by \verpc sending uniform $z\in \F$.
  Since we are in the case that $f$ is not divisble by $Z_T$, we know there are at most
  $2d$ values $z\in \F$ such that $f(z) = H(z)\cdot Z_T(z)$; and thus $z$ chosen by \verpc is of this form only w.p. \negl. Assume we are in the case that $z$ sent by \verpc is not of this form.
-  \prvpc now outputs $W'=\enc1{H'(x)}$ for some $H'\in \polysofdeg{d}$
- According to Lemma \ref{lem:AGManalysis}, it suffices to upper bound the probability that the ideal check corresponding to the real pairing check in the protocol passes.
+  \prvpc now outputs $W'=\enc1{H'(x)}$ for some $H'\in \polysofdeg{d}$.
+ According to Lemma \ref{lem:AGManalysis}, it suffices to upper bound the probability that the ideal check corresponding to the real pairing check in step \ref{stp:verchecksecond} passes.
  Denoting
  \[L'(X)\defeq \sum_{i\in [t]} Z_{T\setminus S_i}(z)\cdot (f_i(X) - r_i(z)) - Z_T(z)\cdot H(X),\]
  the ideal check has the form
@@ -833,15 +796,16 @@ and we are in the case where $f(z)\neq Z_T(z)\cdot H(z)$.
 
 
  
- \subsection*{The \open procedure, ``cleaned up'' and optimized}
+ \subsection{The \open procedure, ``cleaned up'' and optimized}
  
+$\underline{\open(d,\set{\com(f_i)},\set{S_i},\set{r_i})}$:
      \begin{enumerate}
     \item \verpc sends a random challenge $\gamma\in \F$
     \item\label{stp:W} \prvpc sends $W\defeq \enc1{(f/Z_T)(x)}$ where
-    \[f(X)\defeq \sum_{i\in [k]} \gamma^{i-1}\cdot  Z_{T\setminus S_i}(X)(f_i(X)-r_i(X)).\]
+    \[f\defeq \sum_{i\in [k]} \gamma^{i-1}\cdot  Z_{T\setminus S_i}(f_i-r_i).\]
     \item \verpc sends a random evaluation point $z\in \F$
-    \item\label{step:W'} \prvpc sends $W'\defeq \enc1{(f_z/(X-z))(x)}$ where
-    \[f_z(X)\defeq \sum_{i\in [k]} \gamma^{i-1}Z_{T\setminus S_i}(z)\cdot (f_i(X)-r_i(z)) - Z_T(z)\cdot (f/Z_T)(X).\]
+    \item\label{step:W'} \prvpc sends $W'\defeq \enc1{(L(x)/(x-z)}$ where
+    \[L\defeq \sum_{i\in [k]} \gamma^{i-1}Z_{T\setminus S_i}(z)\cdot (f_i-r_i(z)) - Z_T(z)\cdot (f/Z_T).\]
 %     \[f'(X)\defeq \sum_{i\in [k]} \gamma^{i-1}\cdot  Z_{T\setminus S_i}(z)(f_i(X)-r_i(z)) - Z_T(z)(f/Z_T)(X).\]
     \item \verpc computes
      \[F\defeq \sum_{i\in [k]} \gamma^{i-1}  Z_{T\setminus S_i}(z)\cdot \cm_i - \enc1{\sum_{i\in [k]} \gamma^{i-1} Z_{T\setminus S_i}(z)r_i(z)} - Z_T(z)W.\]
@@ -849,6 +813,25 @@ and we are in the case where $f(z)\neq Z_T(z)\cdot H(z)$.
     \item \verpc outputs \acc iff $e(F-zW',\enc2{1}) = e(W',\enc2{x})$.
     \end{enumerate}
 
+From the description and analysis we obtain 
+\begin{lemma}\label{lem:multikateG1}
+There is a PCS $\PCscheme=(\gen,\com,\open)$ such that
+  \begin{enumerate}
+\item For positive integer $d$, $\srs0=\gen(d)$ consists of $d$ \G1 elements and $2$ \G2 elements.
+  \item For integer $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f,\srs0)$ when $\srs0=\gen(d)$ requires $n$ \G1-exponentiations.
+   \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$   and denote $n \defeq \max\sett{\deg(f_i)}{i\in [k]}$.
+   Let $\cm_i = \com(f_i)$.
+   Then $\open\left(\set{\cm_i},\set{f_i},T,\set{S_i\subset T},\set{r_i},\srs0 \right)$ requires
+
+    \begin{enumerate}
+    \item 2 \G1 elements sent from \prvpc to \verpc.
+    \item at most $2n+1$ \G1-exponentiations of \prvpc.
+    \item $k+3$ \G1-exponentiations and 2 pairings of \verpc.
+\end{enumerate}
+\end{enumerate}
+
+
+\end{lemma}
 
 \section*{Acknowledgements}
 Part of this research was conducted while the second author was supported by Protocol Labs.
