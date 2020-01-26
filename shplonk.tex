@@ -568,7 +568,7 @@ We define polynomial commitment schemes similarly to \cite{plonk}.
 Specifically, we define the \open procedure in a batched setting having multiple polynomials and evaluation points.
 
 \begin{dfn}\label{dfn:PCscheme}
-A $d$-polynomial commitment scheme is a triplet $\PCscheme = (\gen,\com,\open)$ such that
+A polynomial commitment scheme is a triplet $\PCscheme = (\gen,\com,\open)$ such that
 \begin{itemize}
  \item $\gen(d)$ -  is a randomized algorithm that given positive integer $d$ outputs a structured reference string (SRS) \srs0.
  \item $\com(f,\srs0)$ - is an algorithm that given a polynomial $f\in \polysofdeg{d}$ and an output \srs0 of $\gen(d)$  returns a commitment \cm to $f$.
@@ -615,8 +615,7 @@ We first state the following straightforward claim that allows us to efficiently
 \begin{claim}\label{clm:div}
  Fix subsets $S\subset T\subset \F$, and polynomials $f,r \in \polysofdeg{d}$.
  Then $f(z)=r(z)$ for each $z\in S$ if and only if
- $Z_T$ divides $Z_{T\setminus S}\cdot (f(X)-r(X))$.
-
+ $z_S(X)$ divides $f(X)-r(X)$ if and only if $Z_T$ divides $Z_{T\setminus S}\cdot (f(X)-r(X))$.
 \end{claim}
 
 
@@ -626,6 +625,10 @@ We first state the following straightforward claim that allows us to efficiently
  $Z_{T\setminus S}\cdot (f(X)-r(X))$ vanishes on $T$ if and only if
  $(f(X)-r(X))$ vanishes on $S$.
 \end{proof}
+
+
+\paragraph{Notational convention:}
+Motivated by claim \ref{clm:div} we will make the following notational convention when describing our two PCSs. Instead of the alleged evaluations \sett{s_{i,z}}{i\in [k],z\in S_i} being an input to the \open protocol. We will give as input polynomials \sett{r_i(X)}{×}
 
 We also use the following claim, which is part of Claim 4.6 in \cite{plonk} where a proof of it can be found.
 \begin{claim}\label{clm:div_sum}
@@ -638,7 +641,6 @@ We also use the following claim, which is part of Claim 4.6 in \cite{plonk} wher
 
 
 
-We are ready to describe our PCS.
 
 \begin{enumerate}
  \item $\gen(d)$ - choose uniform $x\in \F$. Output $\srs0 =(\enc1{1},\enc1{x},\ldots,\enc1{x^{d-1}},\enc2{1},\enc2{x},\ldots,\enc2{x^t})$.
@@ -693,10 +695,9 @@ We are ready to describe our PCS.
  We summarize the efficiency properties of the scheme.
 
  \begin{lemma}\label{lem:multikate}
- Fix a positive integer $d$.
-  There is a $d$-PCD \PCscheme such that
+  There is a PCS $\PCscheme=(\gen,\com,\open)$ such that
   \begin{enumerate}
-   \item For $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f)$ requires $n$ \G1-exponentiations.
+   \item For integers $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f,\srs0)$ when $\srs=\gen(d)$ requires $n$ \G1-exponentiations.
    \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$, denote by $k^*$ the number of distinct subsets  \set{S^*_1,\ldots,S^*_{k^*}} in \set{S_i}; and
    let $K\defeq t+ \sumi {k^*}\left( t-|S^*_i|\right)$.
    and denote $d^* \defeq \max\sett{\deg(f_i)}{i\in [k]}$.
@@ -717,7 +718,8 @@ We are ready to describe our PCS.
 We describe a variant of the scheme of Section \ref{sec:main} where we eliminate the verifier's \G2 operations and reduce the number of pairings to two. This comes at the cost of an extra \G1 element sent by the prover. We state the result first, followed by the description of the scheme.
 
 \begin{lemma}\label{lem:multikateG1}
-Let $n,d$ be positive integers with $n\le d$, $f_i\in\polysofdeg{n}$ for $i\in[k]$, $S_i$ the opening set for $f_i$, $r_i\in\polysofdeg{|S_i|}$ such that $r_i|_{S_i} = f_i|_{S_i}$, $T= S_1\cup\ldots\cup S_k$, and $t=|T|$. Then there is a multi-point multi-polynomial commitment scheme \PCscheme such that:
+Let $n,d$ be positive integers with $n\le d$, $f_i\in\polysofdeg{n}$ for $i\in[k]$, $S_i$ the opening set for $f_i$, $r_i\in\polysofdeg{|S_i|}$ such that $r_i|_{S_i} = f_i|_{S_i}$, $T= S_1\cup\ldots\cup S_k$, and $t=|T|$. There is a PCS $\PCscheme=(\gen,\com,\open)$ such that
+:
 \begin{enumerate}
 \item the commitment $\com(f_i)$ to $f_i$ requires $\deg(f_i)$ \G1-exponentiations
 \item the opening $\open(d,\set{\com(f_i)},\set{S_i},\set{r_i})$ requires
