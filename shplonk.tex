@@ -391,33 +391,43 @@ We present an enhanced version of the Kate, Zaverucha and Goldberg polynomial co
 
 
 As a sample application we ``plug in'' this scheme into the \plonk proving system\cite{plonk} to obtain improved proof size and prover run time at the expense of additional verifier \G2 operations and pairings,  and additional \G2 SRS elements.
+
+We also present a second scheme where the proof consists of two group elements and the verifier complexity is better than previously known batched verification methods for \cite{kate}.
 \end{abstract}
 
 \section{Introduction}
 
-Polynomial commitment schemes (PCS) are an important primitive in arguably all\footnote{While QAP-based proving systems like \cite{pinocchio,groth16} are not traditionally formulated as using a PCS, they can be interpreted as using a PCS that also forces the committed polynomial to be in a certain subspace. This is related to the linear interactive proof framework of  \cite{bciop}.} practical succinct proving systems (see \cite{marlin,plonk,supersonic} for formalizations of their role).  They can ``force'' a prover to answer verifier queries according to a fixed polynomial of bounded degree.
+Polynomial commitment schemes (PCS)\cite{kate} have become a central ingredient in recent constructions of succinct arguments \cite{sonic,auroralight, marlin,plonk,supersonic} when one desires a ``universal and updatable'' setup procedure \cite{firstUniversal}.
+% Moreover, in hindsight, arguably all succinct proving systems can be viewed as using a PCS in some form \footnote{While QAP-based proving systems like \cite{pinocchio,groth16} are not traditionally formulated as using a PCS, they can be interpreted as using a PCS that also forces the committed polynomial to be in a certain subspace. This is related to the linear interactive proof framework of  \cite{bciop}. Low degree testing, the central tool of transparent systems \ (e.g. \cite{bfl,}
+% practical succinct proving systems (see \cite{marlin,plonk,supersonic} for formalizations of their role). 
+They ``force'' a prover to answer verifier queries according to a fixed polynomial of bounded degree.
 
-The use of a PCS typically starts by an initial prover message $\com(f)$ corresponding to the commitment to a polynomial $f$. Then, in the more straightforward use of this primitive, whenever the prover sends a value $s\in \F$ which is allegedly the value $f(z)$ for $z$ known to the verifier, the prover will send a corresponding ``opening proof'' $\pi$ that this is indeed the case. When a PCS is used in this way for several polynomials and several evaluation points, prover run time and proof length will increase with each of these opening proofs.
+The use of a PCS typically starts by an initial prover message $\com(f)$ corresponding to the commitment to a polynomial $f$. Then, in the more straightforward use of this primitive, whenever the prover sends a value $s\in \F$ which is allegedly the value $f(z)$ for $z$ known to the verifier, the prover will send a corresponding ``opening proof'' $\pi$ that this is indeed the case. When a PCS is used in this way during a protocol execution for several polynomials and several evaluation points, prover run time and communication will increase with each of these opening proofs.
 
+Thus, it is of interest to construct PCS where the prover overhead doesn't grow, or at least grows more slowly with the number of openings.
 
 
 \subsection{Previous work and our results}
 
-We take the PCS of Kate, Zaverucha and Goldberg \cite{kate} as our starting point. Their scheme is pairing-based and an opening proof $\pi$ consists of a single $\G1$ group element. We ask whether we can get a variant of this scheme where a single $\G1$ element can prove correctness of multiple polynomial evaluations.
+The notion of a PCS was introduced in the influential work of Kate, Zaverucha and Goldberg \cite{kate}. They presented a pairing-based scheme where an opening proof $\pi$ consists of a single $\G1$ group element.
+%We ask whether we can get a variant of this scheme where a single $\G1$ element can prove correctness of multiple polynomial evaluations.
 
-Several works \cite{sonic,auroralight,marlin,plonk} (starting from \cite{sonic}) have noticed that it is possible to modify the PCS of \cite{kate} in the random oracle model to allow for one opening proof for several polynomials \emph{at the same point $z\in \F$} .
-\cite{kate} give in their paper a less known version of their scheme allowing for one opening proof for one polynomial at several evaluation points.
+\cite{sonic}, who introduced the use of \cite{kate} for universal and updatable SNARKs, modified the PCS of \cite{kate} in the random oracle model, so that a single \G1 element can be an opening proof for several polynomials \emph{at the same point $z\in \F$}. \cite{auroralight,marlin,plonk} followed and used similar single-point multi-polynomial batching protocols.
+
+\cite{kate} give in their paper a less known version of their scheme allowing for a one \G1 element opening proof for \emph{one} polynomial at several evaluation points.
+
+For the case of multiple polynomials and evaluation points, \cite{marlin,plonk} use randomized techniques for batching pairing equations to improve verification efficiency; however opening proof size and prover computation still grow linearly with the number of distinct points.
 
 
 
-In this paper, we give two PCS schemes for multiple evaluation points and polynomials.
+In this paper, we give two PCS for multiple evaluation points and polynomials.
 \begin{itemize}
  \item In our first scheme the opening proof is only a single \G1 element, but verifier operations are considerably heavier than previous variants of \cite{kate} when the number of distinct evaluation points is large (cf. Lemma \ref{lem:multikate}).
-\item In our second scheme the opening proof is 2 \G1 elements, and the verifier complexity is slightly better than previous multipoint variants of \cite{kate} (cf. Lemma \ref{lem:multikateG1}).
+\item In our second scheme the opening proof is two \G1 elements, and the verifier complexity is somewhat better than previous multipoint variants of \cite{kate} (cf. Lemma \ref{lem:multikateG1}).
  \end{itemize}
 
-We compare the performance of our PCSs to a more straightforward batched version of the \cite{kate} scheme as in \cite{plonk}.
-For simplicity, we look at the restricted case where we want to open $t$ polynomials all with the same degree bound $n$, each at one \emph{distinct} point. See Lemma \ref{lem:multikate} for the more detailed efficiency properties in the general case (where each polynomial is opened at a subset of points, and the subsets may repeat).
+We compare the performance of our PCS to a more straightforward batched version of the \cite{kate} scheme as in \cite{plonk}.
+For simplicity, we look at the restricted case where we want to open $t$ polynomials all with the same degree bound $n$, each at one \emph{distinct} point. See Lemma \ref{lem:multikate} and \ref{lem:multikateG1} for the more detailed efficiency properties in the general case (where each polynomial is opened at a subset of points, and the subsets may repeat).
 \begin{table}[!htbp]
 	\caption{Comparison of opening complexity for $t$ polynomials on $t$ distinct points. In prover/verifier work columns \Gi means scalar multiplication in \Gi, \F means addition or multiplication in \F, and \textbf{P} means pairing. }
 	\centering
@@ -427,7 +437,7 @@ For simplicity, we look at the restricted case where we want to open $t$ polynom
 		\kate as in \cite{plonk}
 		         & $n$ \G1, $2$ \G2  & $t\cdot n$ \G1, $O(t\cdot n\log n)$ \F &   $t$ \G1 &  $3t-2$ \G1, $2$ \textbf{P}\\ \hline
 		This work, ver. 1     & $n$ \G1, $t+1$ \G2 &   $n$ \G1, $O(t\cdot n + n\log n)$ \F  & $1$ \G1 & $t-1$ \G1, $2t$ \G2, $t+1$ \textbf{P}   \\ \hline
-	This work, ver. 2     & $n$ \G1, $2$ \G2 &   $2n$ \G1, $O(t\cdot n + n\log n)$ \F  & $2$ \G1 & $2t+1$ \G1, $2$ \textbf{P}   \\ \hline
+	This work, ver. 2     & $n$ \G1, $2$ \G2 &   $2n$ \G1, $O(t\cdot n + n\log n)$ \F  & $2$ \G1 & $t+3$ \G1, $2$ \textbf{P}   \\ \hline
 
 	\end{tabular}
 \end{adjustbox}
@@ -440,7 +450,7 @@ For simplicity, we look at the restricted case where we want to open $t$ polynom
 
 
 The \plonk proving system \cite{plonk}  allows generating proofs of knowledge for assignments
-to fan-in two arithmetic circuits with a universal and updatable SRS (see the paragraph on this topic in Section \ref{sec:terminology}). Most of the prover computation involves committing to several polynomials and opening them at two distinct evaluation points. Plugging in our PCS to \plonk allows saving in proof length and prover work related to the opening proof of the second evaluation point (we do not give full details, but all that is needed is repreating the transformation of Lemma 4.7 in \cite{plonk} using the PCS of Lemma \ref{lem:multikate} instead of the PCS used there to obtain the new result).
+to fan-in two arithmetic circuits with a universal and updatable SRS (see the paragraph on this topic in Section \ref{sec:terminology}). Most of the prover computation involves committing to several polynomials and opening them at two distinct evaluation points. Plugging in our first PCS to \plonk allows saving in proof length and prover work related to the opening proof of the second evaluation point (we do not give full details, but all that is needed is repreating the transformation of Lemma 4.7 in \cite{plonk} using the PCS of Lemma \ref{lem:multikate} instead of the PCS used there to obtain the new result).
 
 We compare the \plonk scheme when using the  \cite{kate}-based PCS in \cite{plonk} and the first PCS of this paper in Table \ref{table:plonk}. As in \cite{plonk} we present two versions of \plonk where one optimizes fast proving, and the other small proof length.
 
@@ -461,7 +471,7 @@ We compare the \plonk scheme when using the  \cite{kate}-based PCS in \cite{plon
 \end{table}
 
 \paragraph{\shplonk?}
-Our second PCS does not give interesting tradeoffs for \plonk as two evaluation points are not enough for its advantages to ``kick in''. However, in a scenario where constraints between \emph{more than two} evaluation points are used, e.g. \cite{slonk}, the advantages of both of our new schemes will become more prominent. Thus, the PCSs of this paper encourage designing constraint systems using multiple SHifts and Permutations over Largange bases for Oecumenical Noninteractive arguments of Knowledge.
+Our second PCS does not give interesting tradeoffs for \plonk as two evaluation points are not enough for its advantages to ``kick in''. However, in a scenario where constraints between \emph{more than two} evaluation points are used, e.g. \cite{slonk}, the advantages of both of our new schemes will become more prominent. Thus, the PCS of this paper encourage designing constraint systems using multiple SHifts and Permutations over Largange bases for Oecumenical Noninteractive arguments of Knowledge.
 \section{Preliminaries}
 
 
@@ -500,7 +510,7 @@ We describe public-coin (meaning the verifier messages are uniformly chosen) int
 We allow our protocols to have access to a structured reference string (SRS) that can be derived in deterministic \poly-time from an ``SRS of monomials'' of the form
 \sett{\enc1{x^i}}{a\leq i \leq b}, \sett{\enc2{x^i}}{c\leq i \leq d}, for uniform $x\in \F$,
 and some integers $a,b,c,d$ with absolute value bounded by \poly.
-It then follows from Bowe et al. \cite{SecondMPC} that the required SRS can be derived in a universal and updatable setup requiring only one honest participant; in the sense that an adversary controlling all but one of the participants in the setup does not gain more than a \negl advantage in its probability of producing a proof of any statement.
+It then follows from Bowe et al. \cite{SecondMPC} that the required SRS can be derived in a universal and updatable setup\cite{firstUniversal} requiring only one honest participant; in the sense that an adversary controlling all but one of the participants in the setup does not gain more than a \negl advantage in its probability of producing a proof of any statement.
 
 For notational simplicity, we sometimes use the SRS \srs0 as an implicit parameter in protocols, and do not explicitly write it.
 
@@ -646,6 +656,7 @@ We also use the following claim, which is part of Claim 4.6 in \cite{plonk} wher
 
 
 
+We present our first PCS.
 \begin{enumerate}
  \item $\gen(d)$ - choose uniform $x\in \F$. Output $\srs0 =(\enc1{1},\enc1{x},\ldots,\enc1{x^{d-1}},\enc2{1},\enc2{x},\ldots,\enc2{x^t})$.
  \item $\com(f,\srs0) \defeq \enc1{f(x)}$.
@@ -662,7 +673,7 @@ We also use the following claim, which is part of Claim 4.6 in \cite{plonk} wher
 % \[]
  \item\label{step:computeW} \verpc computes for each $i\in [k]$, $Z_i \defeq \enc2{Z_{T\setminus S_i}(x)}$.
  \item \verpc computes
- \[F\defeq \sum_{i\in [k]} \gamma^{i-1} \cdot e(\cm_i-\enc1{r_i(x)}, Z_i).\]
+ \[F\defeq \prod_{i\in [k]} e\left(\gamma^{i-1} \cdot (\cm_i-\enc1{r_i(x)}), Z_i\right).\]
  \item \verpc outputs \acc if and only if
  \[ F = e(W,\enc2{Z_T(x)}).\]
  \end{enumerate}
@@ -701,7 +712,7 @@ We also use the following claim, which is part of Claim 4.6 in \cite{plonk} wher
   There is a PCS $\PCscheme=(\gen,\com,\open)$ such that
   \begin{enumerate}
 \item For positive integer $d$, $\srs0=\gen(d)$ consists of $d$ \G1 elements and $t+1$ \G2 elements.
-  \item For integer $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f,\srs0)$ when $\srs0=\gen(d)$ requires $n$ \G1-exponentiations.
+  \item For integer $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f,\srs0)$ requires $n$ \G1-exponentiations.
    \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$, denote by $k^*$ the number of distinct subsets  \set{S^*_1,\ldots,S^*_{k^*}} in \set{S_i}; and
    let $K\defeq t+ \sumi {k^*}\left( t-|S^*_i|\right)$.
    and denote $n \defeq \max\sett{\deg(f_i)}{i\in [k]}$.
@@ -719,13 +730,13 @@ We also use the following claim, which is part of Claim 4.6 in \cite{plonk} wher
 \newpage
 \section{Reducing verifier operations at the expense of proof length}\label{sec:secondpcs}
 
-We describe a variant of the scheme of Section \ref{sec:main} where we eliminate the verifier's \G2 operations and reduce the number of pairings to two. This comes at the cost of an extra \G1 element sent by the prover. Roughly speaking, while in Section \ref{sec:main} \verpc used \G2 and pairing operations to compute the evaluation of a certain polynomial $f$ encoded in the target group, in this protocol \prvpc gives \verpc this evaluation encoded \G1, accompanied by a proof that it is correct (which is the second \G1 element sent by \prvpc).
+We describe a variant of the scheme of Section \ref{sec:main} where we eliminate the verifier's \G2 operations and reduce the number of pairings to two. This comes at the cost of an extra \G1 element sent by the prover. Roughly speaking, while in Section \ref{sec:main} \verpc used \G2 and pairing operations to compute the evaluation of a certain polynomial $f$ encoded in the target group \Gt, in this protocol \prvpc gives \verpc this evaluation encoded in \G1, accompanied by a proof that it is correct.
 We first describe the PCS, and end the section by stating the obtained final result.
 
 
 \begin{enumerate}
-\item $\gen(d)$ outputs $\srs0 =(\enc1{1},\enc1{x},\ldots,\enc1{x^{d-1}},\enc2{1},\enc2{x})$ for a random $x\in \F$
-\item $\com(f_i)=\enc1{f_i(x)}$
+\item $\gen(d)$ outputs $\srs0 =(\enc1{1},\enc1{x},\ldots,\enc1{x^{d-1}},\enc2{1},\enc2{x})$ for a random $x\in \F$.
+\item $\com(f_i)=\enc1{f_i(x)}$.
 \item We describe the \open procedure twice below. First, in a way that will be convenient for the security analysis, and later in an equivalent more concise way that also optimizes verifier operations, .e.g. moves operations from \G2 into \G1 when possible.
 \end{enumerate}
 
@@ -777,18 +788,18 @@ We argue knowledge soundness for the above protocol. More precisely, we argue th
  In the first step of \open, \verpoly chooses a random $\gamma \in \F$.
  Let
  \[f(X)\defeq \sum_{i\in [k]} \gamma^{i-1} \cdot Z_{T\setminus S_i}\cdot (f_i(X)-r_i(X)).\]
- We know from Claim \ref{clm:div} that $F_{i^*} \defeq  Z_{T\setminus S_{i^*}}\cdot (f_{i^*}-r_{i^*})$ is not divisible by $Z_T$. Thus, using Claim \ref{clm:div_sum}, we know that e.w.p $k/|\F|$ over $\gamma$, $f$ is not divisble by $Z_T$. Assume we are in this case.  Now \adv outputs $W=\enc1{H(x)}$ for some $H\in\polysofdeg{d}$, followed by \verpc sending uniform $z\in \F$.
+ We know from Claim \ref{clm:div} that $F_{i^*} \defeq  Z_{T\setminus S_{i^*}} (f_{i^*}-r_{i^*})$ is not divisible by $Z_T$. Thus, using Claim \ref{clm:div_sum}, we know that e.w.p $k/|\F|$ over $\gamma$, $f$ is not divisble by $Z_T$. Assume we are in this case.  Now \adv outputs $W=\enc1{H(x)}$ for some $H\in\polysofdeg{d}$, followed by \verpc sending uniform $z\in \F$.
  Since we are in the case that $f$ is not divisble by $Z_T$, we know there are at most
  $2d$ values $z\in \F$ such that $f(z) = H(z)\cdot Z_T(z)$; and thus $z$ chosen by \verpc is of this form only w.p. \negl. Assume we are in the case that $z$ sent by \verpc is not of this form.
   \prvpc now outputs $W'=\enc1{H'(x)}$ for some $H'\in \polysofdeg{d}$.
  According to Lemma \ref{lem:AGManalysis}, it suffices to upper bound the probability that the ideal check corresponding to the real pairing check in step \ref{stp:verchecksecond} passes.
  Denoting
- \[L'(X)\defeq \sum_{i\in [t]} Z_{T\setminus S_i}(z)\cdot (f_i(X) - r_i(z)) - Z_T(z)\cdot H(X),\]
+ \[L'(X)\defeq \sum_{i\in [k]}\gamma^{i-1} Z_{T\setminus S_i}(z)\cdot (f_i(X) - r_i(z)) - Z_T(z)\cdot H(X),\]
  the ideal check has the form
  \[L'(X)\equiv H'(X)\cdot (X-z),\]
  and thus can pass for some $H'\in \polysofdeg{d}$ only if $L'$ is divisible by $(X-z)$, which means $L'(z)=0$.
  However
- \[L'(z) = \sum_{i\in [t]} Z_{T\setminus S_i}(z)\cdot (f_i(z) - r_i(z)) - Z_T(z)\cdot H(z)=
+ \[L'(z) = \sum_{i\in [k]}\gamma^{i-1} Z_{T\setminus S_i}(z)\cdot (f_i(z) - r_i(z)) - Z_T(z)\cdot H(z)=
   f(z)-Z_T(z)\cdot H(z),
  \]
 and we are in the case where $f(z)\neq Z_T(z)\cdot H(z)$.
@@ -798,9 +809,9 @@ and we are in the case where $f(z)\neq Z_T(z)\cdot H(z)$.
  
  \subsection{The \open procedure, ``cleaned up'' and optimized}
  
-$\underline{\open(d,\set{\com(f_i)},\set{S_i},\set{r_i})}$:
+$\underline{\open(\set{\com(f_i)},\set{S_i},\set{r_i})}$:
      \begin{enumerate}
-    \item \verpc sends a random challenge $\gamma\in \F$
+    \item \verpc sends a random challenge $\gamma\in \F$.
     \item\label{stp:W} \prvpc sends $W\defeq \enc1{(f/Z_T)(x)}$ where
     \[f\defeq \sum_{i\in [k]} \gamma^{i-1}\cdot  Z_{T\setminus S_i}(f_i-r_i).\]
     \item \verpc sends a random evaluation point $z\in \F$
@@ -818,7 +829,7 @@ From the description and analysis we obtain
 There is a PCS $\PCscheme=(\gen,\com,\open)$ such that
   \begin{enumerate}
 \item For positive integer $d$, $\srs0=\gen(d)$ consists of $d$ \G1 elements and $2$ \G2 elements.
-  \item For integer $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f,\srs0)$ when $\srs0=\gen(d)$ requires $n$ \G1-exponentiations.
+  \item For integer $n\leq d$ and $f\in \polysofdeg{n}$, computing $\com(f,\srs0)$ requires $n$ \G1-exponentiations.
    \item Given $T \defeq (z_1,\ldots,z_t)\in \F^t, f_1,\ldots, f_k \in \polysofdeg{d}, \sett{S_i}{i\in [k]}$   and denote $n \defeq \max\sett{\deg(f_i)}{i\in [k]}$.
    Let $\cm_i = \com(f_i)$.
    Then $\open\left(\set{\cm_i},\set{f_i},T,\set{S_i\subset T},\set{r_i},\srs0 \right)$ requires
