@@ -818,10 +818,9 @@ $\underline{\open(\set{\com(f_i)},\set{S_i},\set{r_i})}$:
     \item\label{step:W'} \prvpc sends $W'\defeq \enc1{(L(x)/(x-z)}$ where
     \[L\defeq \sum_{i\in [k]} \gamma^{i-1}Z_{T\setminus S_i}(z)\cdot (f_i-r_i(z)) - Z_T(z)\cdot (f/Z_T).\]
 %     \[f'(X)\defeq \sum_{i\in [k]} \gamma^{i-1}\cdot  Z_{T\setminus S_i}(z)(f_i(X)-r_i(z)) - Z_T(z)(f/Z_T)(X).\]
-    \item \verpc computes
-     \[F\defeq \sum_{i\in [k]} \gamma^{i-1}  Z_{T\setminus S_i}(z)\cdot \cm_i - \enc1{\sum_{i\in [k]} \gamma^{i-1} Z_{T\setminus S_i}(z)r_i(z)} - Z_T(z)W.\]
 %      \[F\defeq \sum_{i\in [k]} \gamma^{i-1}  Z_{T\setminus S_i}(z)\cdot (\cm_i - \enc1{r_i(z)}) - Z_T(z)W.\]
-    \item \verpc outputs \acc iff $e(F-zW',\enc2{1}) = e(W',\enc2{x})$.
+    \item \verpc outputs \acc iff $e(F-zW',\enc2{1}) = e(W',\enc2{x})$,
+where     \[F\defeq \sum_{i\in [k]} \gamma^{i-1}  Z_{T\setminus S_i}(z)\cdot \cm_i - \enc1{\sum_{i\in [k]} \gamma^{i-1} Z_{T\setminus S_i}(z)r_i(z)} - Z_T(z)W.\]
     \end{enumerate}
 
 From the description and analysis we obtain 
