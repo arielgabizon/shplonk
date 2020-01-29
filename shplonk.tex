@@ -88,7 +88,7 @@
 %\newcommand{\authorname}}
 \newcommand{\company}{}
 \title{ \bf \papertitle \\[0.72cm]}
-\author{Justin Drake \\ \tt{Ethereum Foundation} \and  Ariel Gabizon\\ \tt{AZTEC Protocol}}
+\author{Dan Boneh\\ \tt{Stanford University}  \and Justin Drake\\ \tt{Ethereum Foundation} \and   Ben Fisch\\ \tt{Stanford University} \and  Ariel Gabizon\\ \tt{AZTEC Protocol}}
 
 % 	\large{\authorname} \\[0.5cm] \large{\company}
 % 	\\ {DRAFT}
@@ -579,8 +579,7 @@ the probability of any algebraic adversary \adv winning the following game is \n
 \subsection{Polynomial commitment schemes}\label{subsec:PCS}
 We define polynomial commitment schemes similarly to \cite{plonk}.
 Specifically, we define the \open procedure in a batched setting having multiple polynomials and evaluation points.
-In the context of multiple points, it will be more convenient to assume the alleged evaluation points 
-of a polynomial $f$ on a set $S\subset \F$  are given as a \emph{polynomial} $r\in \polysofdeg{|S|}$ with
+In the context of multiple points, it will be more convenient to assume the alleged evaluations of a polynomial $f$ on a set $S\subset \F$  are given as a \emph{polynomial} $r\in \polysofdeg{|S|}$ with
 $r(z)=f(z)$ for each $z\in S$. Under this convention, the condition that the evaluations are correct; i.e. $r(z)=f(z)$ for each $z\in S$, is equivalent to $f(X)-r(X)$ being divisble by $Z_S(X)$;
 where $Z_S(X)\defeq \prod_{z\in S} (X-z)$.
 
@@ -727,7 +726,7 @@ We present our first PCS.
 
 \end{lemma}
 
-\newpage
+% \newpage
 \section{Reducing verifier operations at the expense of proof length}\label{sec:secondpcs}
 
 We describe a variant of the scheme of Section \ref{sec:main} where we eliminate the verifier's \G2 operations and reduce the number of pairings to two. This comes at the cost of an extra \G1 element sent by the prover. Roughly speaking, while in Section \ref{sec:main} \verpc used \G2 and pairing operations to compute the evaluation of a certain polynomial $f$ encoded in the target group \Gt, in this protocol \prvpc gives \verpc this evaluation encoded in \G1, accompanied by a proof that it is correct.
@@ -844,7 +843,7 @@ There is a PCS $\PCscheme=(\gen,\com,\open)$ such that
 \end{lemma}
 
 \section*{Acknowledgements}
-Part of this research was conducted while the second author was supported by Protocol Labs.
+Part of this research was conducted while the second author was supported by Protocol Labs. We thank Zachary J. Williamson for helpful conversations. 
 \bibliographystyle{alpha}
 \bibliography{references}
 
